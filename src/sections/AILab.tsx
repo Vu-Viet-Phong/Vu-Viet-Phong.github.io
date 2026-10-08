@@ -1,65 +1,42 @@
-import { useState } from 'react';
-import { Search, Bot, Sliders, ChevronRight, Activity, Cpu, FileText, Database, Link as LinkIcon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Bot, Sliders, Activity, Cpu, Database, User } from 'lucide-react';
 
 type GraphRAGStage = 'Query' | 'Vector' | 'Graph' | 'Fusion' | 'Rerank' | 'Answer';
 const stages: GraphRAGStage[] = ['Query', 'Vector', 'Graph', 'Fusion', 'Rerank', 'Answer'];
 
-const stageData: Record<GraphRAGStage, any> = {
-  Query: { 
-    title: 'Query Understanding', 
-    desc: 'Parsing user intent and extracting key entities for search.', 
-    details: [
-      { key: 'Raw Input', val: '"Find me an elegant silk evening gown for an outdoor gala."' },
-      { key: 'Intent Type', val: 'Product Discovery' },
-      { key: 'Entities Extracted', val: '{"Category": "Gown", "Material": "Silk", "Occasion": ["Evening", "Outdoor"]}' }
-    ]
-  },
-  Vector: { 
-    title: 'Dense Vector Retrieval', 
-    desc: 'Fetching semantically similar unstructured documents via cosine similarity.', 
-    details: [
-      { doc: 'Doc-8492: "Emerald Evening Gown"', score: 0.89 },
-      { doc: 'Doc-1123: "Silk Summer Dress"', score: 0.72 },
-      { doc: 'Doc-9910: "Formal Satin Gown"', score: 0.68 }
-    ]
-  },
-  Graph: { 
-    title: 'Graph-Based Retrieval', 
-    desc: 'Traversing the Neo4j Knowledge Graph to find structured multi-hop relationships.', 
-    nodes: ['Product:8492', 'Material:Silk', 'Occasion:Gala'],
-    edges: ['(Product:8492)-[:MADE_OF]->(Material:Silk)', '(Product:8492)-[:SUITABLE_FOR]->(Occasion:Gala)']
-  },
-  Fusion: { 
-    title: 'Candidate Fusion', 
-    desc: 'Merging vector candidates with structural graph contexts (Reciprocal Rank Fusion).', 
-    details: [
-      { candidate: 'Product:8492', vectorRank: 1, graphRank: 1, rrfScore: 0.032 },
-      { candidate: 'Product:1123', vectorRank: 2, graphRank: 5, rrfScore: 0.018 }
-    ]
-  },
-  Rerank: { 
-    title: 'Reranking', 
-    desc: 'Cross-encoder scoring to prioritize the most relevant contexts.', 
-    text: 'Selected Context #1: [Product:8492] is an Emerald Evening Gown made of Silk. Suitable for Gala/Evening.'
-  },
-  Answer: { 
-    title: 'Grounded Answer', 
-    desc: 'LLM generates response explicitly citing the retrieved context.', 
-    answer: 'The Emerald Evening Gown [1] perfectly matches your criteria. It is crafted from 100% Silk [2] and designed specifically for formal evening occasions like an outdoor gala [3].',
-    citations: [
-      '[1] Doc-8492: Product Title',
-      '[2] KG Edge: Product:8492 -> Material:Silk',
-      '[3] KG Edge: Product:8492 -> Occasion:Gala'
-    ]
-  }
+const queries = [
+  "Find me an elegant silk evening gown for an outdoor gala.",
+  "I'm looking for a comfortable casual cotton dress.",
+  "Suggest a minimalist professional outfit in dark colors."
+];
+
+const stageDataTemplate: Record<GraphRAGStage, any> = {
+  Query: { title: 'Query Understanding', desc: 'Parsing user intent and extracting key entities.' },
+  Vector: { title: 'Dense Vector Retrieval', desc: 'Fetching semantically similar unstructured documents.' },
+  Graph: { title: 'Graph-Based Retrieval', desc: 'Traversing the Neo4j KG to find structured multi-hop relationships.' },
+  Fusion: { title: 'Candidate Fusion', desc: 'Merging vector candidates with structural graph contexts (RRF).' },
+  Rerank: { title: 'Reranking', desc: 'Cross-encoder scoring to prioritize contexts.' },
+  Answer: { title: 'Grounded Answer', desc: 'LLM generates response explicitly citing retrieved context.' }
 };
+
+const profiles = [
+  { id: 'u1', name: 'Casual User', intent: 'Casual, Cotton, Daywear', avatarColor: '#4BD5E8' },
+  { id: 'u2', name: 'Formal User', intent: 'Elegant, Silk, Evening', avatarColor: '#9788EF' }
+];
 
 export const AILab = () => {
   const [activeTab, setActiveTab] = useState<'graphrag' | 'arena'>('graphrag');
+  
+  // GraphRAG State
+  const [selectedQueryIdx, setSelectedQueryIdx] = useState(0);
   const [activeStage, setActiveStage] = useState<GraphRAGStage>('Query');
   const [isSimulating, setIsSimulating] = useState(false);
-  
-  const [arenaModel, setArenaModel] = useState<'LightGCN' | 'NGCF'>('LightGCN');
+  const [currentStageData, setCurrentStageData] = useState<any>(null);
+
+  // Arena State
+  const [activeProfile, setActiveProfile] = useState(profiles[0]);
+  const [arenaModel1, setArenaModel1] = useState<'MF'|'NGCF'|'LightGCN'|'VBPR'>('LightGCN');
+  const [arenaModel2, setArenaModel2] = useState<'MF'|'NGCF'|'LightGCN'|'VBPR'|'None'>('None');
   const [topK, setTopK] = useState(5);
 
   const runSimulation = () => {
@@ -76,8 +53,49 @@ export const AILab = () => {
     }, 1200);
   };
 
+  useEffect(() => {
+    // Generate deterministic mock data based on query and stage
+    const query = queries[selectedQueryIdx];
+    const data = { ...stageDataTemplate[activeStage] };
+    
+    if (activeStage === 'Query') {
+      data.details = [
+        { key: 'Raw Input', val: `"${query}"` },
+        { key: 'Extracted Entities', val: selectedQueryIdx === 0 ? '{"Category": "Gown", "Material": "Silk"}' : '{"Category": "Dress", "Material": "Cotton"}' }
+      ];
+    } else if (activeStage === 'Vector') {
+      data.details = [
+        { doc: `Doc-8492: "Match for ${selectedQueryIdx}"`, score: 0.89 },
+        { doc: `Doc-1123: "Alternative"`, score: 0.72 }
+      ];
+    } else if (activeStage === 'Graph') {
+      data.nodes = ['Product:8492', 'Material:Silk'];
+      data.edges = ['(Product:8492)-[:MADE_OF]->(Material:Silk)'];
+    } else if (activeStage === 'Fusion') {
+      data.details = [{ candidate: 'Product:8492', vectorRank: 1, graphRank: 1, rrfScore: 0.032 }];
+    } else if (activeStage === 'Rerank') {
+      data.text = `Selected Context: [Product:8492] matches ${query}`;
+    } else if (activeStage === 'Answer') {
+      data.answer = `Based on the graph, the Product:8492 [1] perfectly matches your criteria.`;
+      data.citations = ['[1] Doc-8492: Product Node (source_id: neo4j_8492)'];
+    }
+    setCurrentStageData(data);
+  }, [activeStage, selectedQueryIdx]);
+
+  const generateRecommendations = (model: string, profile: any) => {
+    // Deterministic mock generation
+    const seed = model.length + profile.name.length;
+    return [...Array(topK)].map((_, i) => ({
+      id: 101 + i + seed,
+      name: `Synthetic ${model} Item ${i + 1}`,
+      score: (0.95 - (i * (0.05 + (seed*0.001)))).toFixed(3),
+      category: i % 2 === 0 ? 'Apparel' : 'Accessories'
+    }));
+  };
+
   const renderInspectorContent = () => {
-    const data = stageData[activeStage];
+    if (!currentStageData) return null;
+    const data = currentStageData;
     
     switch (activeStage) {
       case 'Query':
@@ -109,22 +127,12 @@ export const AILab = () => {
             <div className="bg-[#0a0f18] p-4 rounded-lg border border-surfaceHighlight h-40 flex items-center justify-center relative overflow-hidden">
                <svg viewBox="0 0 100 50" className="w-full h-full max-w-[250px] opacity-80">
                   <circle cx="20" cy="25" r="8" fill="#4BD5E8" />
-                  <circle cx="80" cy="10" r="6" fill="#9788EF" />
-                  <circle cx="80" cy="40" r="6" fill="#9788EF" />
-                  <line x1="28" y1="23" x2="74" y2="12" stroke="#fff" strokeWidth="0.5" strokeDasharray="1 1" />
-                  <line x1="28" y1="27" x2="74" y2="38" stroke="#fff" strokeWidth="0.5" strokeDasharray="1 1" />
-                  <text x="50" y="15" fontSize="4" fill="#fff" textAnchor="middle">MADE_OF</text>
-                  <text x="50" y="38" fontSize="4" fill="#fff" textAnchor="middle">SUITABLE_FOR</text>
-                  <text x="20" y="38" fontSize="4" fill="#4BD5E8" textAnchor="middle">Product:8492</text>
-                  <text x="80" y="20" fontSize="4" fill="#9788EF" textAnchor="middle">Material:Silk</text>
-                  <text x="80" y="50" fontSize="4" fill="#9788EF" textAnchor="middle">Occasion:Gala</text>
+                  <circle cx="80" cy="25" r="6" fill="#9788EF" />
+                  <line x1="28" y1="25" x2="74" y2="25" stroke="#fff" strokeWidth="0.5" strokeDasharray="1 1" />
+                  <text x="50" y="23" fontSize="4" fill="#fff" textAnchor="middle">RELATIONSHIP</text>
+                  <text x="20" y="38" fontSize="4" fill="#4BD5E8" textAnchor="middle">Product</text>
+                  <text x="80" y="38" fontSize="4" fill="#9788EF" textAnchor="middle">Attribute</text>
                </svg>
-            </div>
-            <div className="space-y-2">
-              <div className="text-[10px] font-mono text-textMuted uppercase">Traversed Edges</div>
-              {data.edges.map((e: string, i: number) => (
-                <div key={i} className="text-xs text-secondary font-mono bg-[#0a0f18] p-2 rounded border border-surfaceHighlight">{e}</div>
-              ))}
             </div>
           </div>
         );
@@ -134,8 +142,6 @@ export const AILab = () => {
             <thead>
               <tr className="text-[10px] font-mono text-textMuted uppercase border-b border-surfaceHighlight">
                 <th className="pb-2">Candidate</th>
-                <th className="pb-2">Vec Rank</th>
-                <th className="pb-2">Graph Rank</th>
                 <th className="pb-2">RRF Score</th>
               </tr>
             </thead>
@@ -143,8 +149,6 @@ export const AILab = () => {
               {data.details.map((d: any, i: number) => (
                 <tr key={i} className="border-b border-surfaceHighlight/30">
                   <td className="py-3 text-slate-300 font-mono">{d.candidate}</td>
-                  <td className="py-3 text-slate-400">{d.vectorRank}</td>
-                  <td className="py-3 text-slate-400">{d.graphRank}</td>
                   <td className="py-3 text-primary font-mono">{d.rrfScore.toFixed(3)}</td>
                 </tr>
               ))}
@@ -154,10 +158,6 @@ export const AILab = () => {
       case 'Rerank':
         return (
           <div className="bg-[#0a0f18] p-4 rounded-lg border border-primary/30 shadow-[0_0_15px_rgba(75,213,232,0.1)]">
-            <div className="flex items-center gap-2 mb-3">
-              <FileText className="w-4 h-4 text-primary" />
-              <span className="text-xs font-semibold text-white">Final Context Prompt</span>
-            </div>
             <p className="text-xs text-slate-300 leading-relaxed italic border-l-2 border-primary/50 pl-3">
               {data.text}
             </p>
@@ -170,7 +170,7 @@ export const AILab = () => {
               <p className="text-sm text-white leading-relaxed">{data.answer}</p>
             </div>
             <div className="space-y-2">
-              <div className="text-[10px] font-mono text-textMuted uppercase flex items-center gap-2"><LinkIcon className="w-3 h-3"/> Local Dataset Citations</div>
+              <div className="text-[10px] font-mono text-textMuted uppercase">Evidence Citations</div>
               {data.citations.map((c: string, i: number) => (
                 <div key={i} className="text-xs text-slate-400 font-mono">{c}</div>
               ))}
@@ -206,9 +206,6 @@ export const AILab = () => {
               Recommendation Arena
             </button>
           </div>
-          <div className="mt-6 text-[11px] font-mono uppercase tracking-wider text-yellow-500/80 bg-yellow-500/10 inline-block px-4 py-1.5 rounded-full border border-yellow-500/20">
-            Interactive Pipeline Simulation — Local Demo Dataset
-          </div>
         </div>
 
         {activeTab === 'graphrag' && (
@@ -217,22 +214,26 @@ export const AILab = () => {
             <div className="lg:col-span-7 space-y-8 p-4">
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-white flex items-center gap-2">
-                  <Search className="w-4 h-4 text-secondary" /> Test Query
+                  <Search className="w-4 h-4 text-secondary" /> Select Test Query
                 </label>
-                <div className="flex gap-3">
-                  <input 
-                    type="text" 
-                    disabled
-                    value="Find me an elegant silk evening gown for an outdoor gala." 
-                    className="flex-1 bg-surface border border-surfaceHighlight rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:border-secondary transition-colors"
-                  />
+                <select 
+                  value={selectedQueryIdx}
+                  onChange={(e) => { setSelectedQueryIdx(Number(e.target.value)); setActiveStage('Query'); }}
+                  disabled={isSimulating}
+                  className="w-full bg-surface border border-surfaceHighlight rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:border-secondary transition-colors"
+                >
+                  {queries.map((q, idx) => (
+                    <option key={idx} value={idx}>{q}</option>
+                  ))}
+                </select>
+                <div className="pt-2">
                   <button 
                     onClick={runSimulation}
                     disabled={isSimulating}
-                    className="px-6 py-3 bg-secondary text-white rounded-xl font-medium hover:bg-secondary/80 disabled:opacity-50 transition-all flex items-center gap-2"
+                    className="w-full px-6 py-3 bg-secondary text-white rounded-xl font-medium hover:bg-secondary/80 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                   >
                     {isSimulating ? <Activity className="w-4 h-4 animate-spin" /> : <Cpu className="w-4 h-4" />}
-                    Run
+                    Run Execution Pipeline
                   </button>
                 </div>
               </div>
@@ -251,8 +252,8 @@ export const AILab = () => {
                         {idx + 1}
                       </div>
                       <div className={`flex-1 p-4 rounded-xl border transition-all ${activeStage === stage ? 'bg-secondary/10 border-secondary/30' : 'bg-surface/30 border-transparent group-hover:border-surfaceHighlight'}`}>
-                        <h4 className="font-semibold text-white text-sm mb-1">{stageData[stage].title}</h4>
-                        <p className="text-xs text-slate-400">{stageData[stage].desc}</p>
+                        <h4 className="font-semibold text-white text-sm mb-1">{stageDataTemplate[stage].title}</h4>
+                        <p className="text-xs text-slate-400">{stageDataTemplate[stage].desc}</p>
                       </div>
                     </div>
                   ))}
@@ -268,8 +269,7 @@ export const AILab = () => {
               
               <div className="flex-1 space-y-6">
                 <div>
-                  <h4 className="text-[10px] font-mono text-secondary uppercase mb-2">Stage: {stageData[activeStage].title}</h4>
-                  <p className="text-xs text-slate-400">{stageData[activeStage].desc}</p>
+                  <h4 className="text-[10px] font-mono text-secondary uppercase mb-2">Stage: {stageDataTemplate[activeStage].title}</h4>
                 </div>
 
                 <div className="bg-surface/50 rounded-xl border border-surfaceHighlight p-4">
@@ -283,71 +283,122 @@ export const AILab = () => {
         {activeTab === 'arena' && (
           <div className="glass-panel rounded-3xl border border-primary/30 p-2 md:p-8 grid lg:grid-cols-12 gap-8 animate-fade-in-up">
             <div className="lg:col-span-4 space-y-8 p-4 border-r border-surfaceHighlight/50">
+              
+              {/* Profile Selector */}
               <div>
                 <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-primary" /> Model Controls
+                  <User className="w-4 h-4 text-primary" /> Test Profile
                 </h3>
-                
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-xs font-mono text-textMuted uppercase">Algorithm</label>
-                    <select 
-                      value={arenaModel}
-                      onChange={(e) => setArenaModel(e.target.value as 'LightGCN'|'NGCF')}
-                      className="w-full bg-surface border border-surfaceHighlight rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary"
+                <div className="flex gap-2">
+                  {profiles.map(p => (
+                    <button 
+                      key={p.id}
+                      onClick={() => setActiveProfile(p)}
+                      className={`flex-1 p-3 rounded-xl border transition-all ${activeProfile.id === p.id ? 'bg-primary/10 border-primary text-white' : 'bg-surface border-surfaceHighlight text-slate-400 hover:text-white'}`}
                     >
-                      <option value="LightGCN">LightGCN (Graph Convolution)</option>
+                      <div className="text-xs font-semibold mb-1">{p.name}</div>
+                      <div className="text-[9px] font-mono opacity-80">{p.intent}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-primary" /> Model Comparison
+                </h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-mono text-textMuted uppercase">Model 1 (Primary)</label>
+                    <select 
+                      value={arenaModel1}
+                      onChange={(e) => setArenaModel1(e.target.value as any)}
+                      className="w-full bg-surface border border-surfaceHighlight rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                    >
+                      <option value="MF">Matrix Factorization (MF)</option>
                       <option value="NGCF">NGCF (Neural Graph CF)</option>
+                      <option value="LightGCN">LightGCN</option>
+                      <option value="VBPR">VBPR (Visual BPR)</option>
                     </select>
                   </div>
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <label className="text-xs font-mono text-textMuted uppercase">Top-K Items</label>
-                      <span className="text-xs font-mono text-primary">K={topK}</span>
-                    </div>
-                    <input 
-                      type="range" min="1" max="10" value={topK} 
-                      onChange={(e) => setTopK(parseInt(e.target.value))}
-                      className="w-full accent-primary" 
-                    />
-                  </div>
-                  
-                  <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
-                    <h4 className="text-[10px] font-mono text-primary uppercase mb-2">Model Note</h4>
-                    <p className="text-xs text-slate-300">
-                      {arenaModel === 'LightGCN' 
-                        ? 'LightGCN learns user and item embeddings by linearly propagating them on the user-item interaction graph.' 
-                        : 'NGCF explicitly encodes the collaborative signal in the form of high-order connectivities.'}
-                    </p>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-mono text-textMuted uppercase">Model 2 (Optional)</label>
+                    <select 
+                      value={arenaModel2}
+                      onChange={(e) => setArenaModel2(e.target.value as any)}
+                      className="w-full bg-surface border border-surfaceHighlight rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                    >
+                      <option value="None">-- None --</option>
+                      <option value="MF">Matrix Factorization (MF)</option>
+                      <option value="NGCF">NGCF (Neural Graph CF)</option>
+                      <option value="LightGCN">LightGCN</option>
+                      <option value="VBPR">VBPR (Visual BPR)</option>
+                    </select>
                   </div>
                 </div>
+              </div>
+
+              <div className="space-y-3 pt-4 border-t border-surfaceHighlight/50">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-mono text-textMuted uppercase">Top-K Items</label>
+                  <span className="text-xs font-mono text-primary">K={topK}</span>
+                </div>
+                <input 
+                  type="range" min="1" max="10" value={topK} 
+                  onChange={(e) => setTopK(parseInt(e.target.value))}
+                  className="w-full accent-primary" 
+                />
               </div>
             </div>
 
             <div className="lg:col-span-8 p-4">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                  <Bot className="w-4 h-4 text-primary" /> Generated Recommendation List
+                  <Bot className="w-4 h-4 text-primary" /> Recommendation Inference
                 </h3>
+                <span className="px-2.5 py-1 rounded bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[9px] font-mono uppercase tracking-wider">
+                  Simulation Mode
+                </span>
               </div>
               
-              <div className="space-y-3">
-                {[...Array(topK)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-surface/40 border border-surfaceHighlight hover:border-primary/50 transition-colors group">
-                    <div className="w-10 h-10 rounded-lg bg-surface flex items-center justify-center font-mono text-xs text-textMuted group-hover:text-primary transition-colors">
-                      #{i + 1}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-sm font-semibold text-white">Synthetic Product {i + 101}</h4>
-                      <div className="flex items-center gap-4 mt-1">
-                        <span className="text-[10px] font-mono text-primary">Score: {(0.95 - i*0.05).toFixed(3)}</span>
-                        <span className="text-[10px] font-mono text-textMuted">Category: {(i % 2 === 0) ? 'Apparel' : 'Accessories'}</span>
+              <div className={`grid gap-6 ${arenaModel2 !== 'None' ? 'grid-cols-2' : 'grid-cols-1 max-w-lg mx-auto'}`}>
+                {/* Model 1 Results */}
+                <div>
+                  <h4 className="text-xs font-mono text-primary uppercase mb-4 text-center border-b border-surfaceHighlight pb-2">{arenaModel1} Ranking</h4>
+                  <div className="space-y-3">
+                    {generateRecommendations(arenaModel1, activeProfile).map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-surface/40 border border-surfaceHighlight hover:border-primary/50 transition-colors group">
+                        <div className="w-8 h-8 rounded bg-surface flex items-center justify-center font-mono text-[10px] text-textMuted group-hover:text-primary">
+                          #{i + 1}
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="text-xs font-semibold text-white">{item.name}</h5>
+                          <div className="text-[9px] font-mono text-primary mt-0.5">Score: {item.score}</div>
+                        </div>
                       </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-textMuted opacity-0 group-hover:opacity-100 transition-opacity" />
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                {/* Model 2 Results */}
+                {arenaModel2 !== 'None' && (
+                  <div>
+                    <h4 className="text-xs font-mono text-secondary uppercase mb-4 text-center border-b border-surfaceHighlight pb-2">{arenaModel2} Ranking</h4>
+                    <div className="space-y-3">
+                      {generateRecommendations(arenaModel2, activeProfile).map((item, i) => (
+                        <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-surface/40 border border-surfaceHighlight hover:border-secondary/50 transition-colors group">
+                          <div className="w-8 h-8 rounded bg-surface flex items-center justify-center font-mono text-[10px] text-textMuted group-hover:text-secondary">
+                            #{i + 1}
+                          </div>
+                          <div className="flex-1">
+                            <h5 className="text-xs font-semibold text-white">{item.name}</h5>
+                            <div className="text-[9px] font-mono text-secondary mt-0.5">Score: {item.score}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
