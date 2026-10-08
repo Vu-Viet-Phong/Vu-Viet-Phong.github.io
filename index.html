@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VuAnalytics — Autonomous AI Data Intelligence Platform</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#090D16',
+                        darkCard: '#111726',
+                        darkBorder: '#1F293D',
+                        claudeOrange: '#D97706',
+                        neonPurple: '#8B5CF6',
+                        neonBlue: '#38BDF8',
+                        neonEmerald: '#10B981'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #070A11;
+            color: #F1F5F9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Backgrounds */
+        .ambient-glow {
+            position: absolute;
+            filter: blur(120px);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-1 {
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, rgba(56, 189, 248, 0.05) 70%, transparent 100%);
+            top: -60px;
+            left: 20%;
+        }
+
+        .glow-2 {
+            width: 520px;
+            height: 520px;
+            background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, rgba(139, 92, 246, 0.06) 70%, transparent 100%);
+            top: 400px;
+            right: 5%;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(17, 23, 38, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(15, 21, 36, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px -10px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090D16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1F293D;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+
+        /* Shimmer text effect */
+        .gradient-text {
+            background: linear-gradient(135deg, #FFFFFF 20%, #A5B4FC 60%, #38BDF8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gradient-claude {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 50%, #B45309 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+
+<body class="relative min-h-screen selection:bg-purple-600/30 selection:text-white">
+
+    <!-- Ambient Lights -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-white/[0.05] bg-[#070A11]/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-sky-400 p-[1px] shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300">
+                    <div class="w-full h-full bg-[#0B0F19] rounded-[11px] flex items-center justify-center">
+                        <i data-lucide="cpu" class="w-5 h-5 text-sky-400"></i>
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl font-bold tracking-tight text-white group-hover:text-sky-300 transition-colors">VuAnalytics</span>
+                        <span class="text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            Sonnet 3.5
+                        </span>
+                    </div>
+                    <span class="text-[11px] text-gray-400 tracking-wider">Autonomous AI Intelligence</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Items -->
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
+                <a href="#features" class="hover:text-white transition-colors">Features</a>
+                <a href="#demo" class="hover:text-white transition-colors">Live Simulation</a>
+                <a href="#architecture" class="hover:text-white transition-colors">Architecture</a>
+                <a href="#metrics" class="hover:text-white transition-colors">Metrics</a>
+                <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+            </nav>
+
+            <!-- Action CTAs -->
+            <div class="hidden sm:flex items-center gap-3">
+                <a href="https://platform.claude.com" target="_blank" class="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors">Sign In</a>
+                <a href="#demo" class="relative group px-5 py-2.5 rounded-xl font-medium text-sm text-white overflow-hidden shadow-lg shadow-purple-500/20 transition-all duration-300 hover:shadow-purple-500/35">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 via-indigo-600 to-sky-500 transition-transform duration-300 group-hover:scale-105"></div>
+                    <span class="relative flex items-center gap-2">
+                        Get Early Access
+                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </span>
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle Button -->
+            <div class="md:hidden flex items-center">
+                <button id="mobileMenuBtn" class="p-2 rounded-lg bg-gray-800/60 text-gray-400 hover:text-white border border-gray-700/50" aria-label="Open menu">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobileMenu" class="hidden md:hidden px-4 pt-2 pb-6 space-y-3 bg-[#0B0F19]/95 border-b border-gray-800">
+            <a href="#features" class="block px-3 py-2 text-gray-300 hover:text-white">Features</a>
+            <a href="#demo" class="block px-3 py-2 text-gray-300 hover:text-white">Live Simulation</a>
+            <a href="#architecture" class="block px-3 py-2 text-gray-300 hover:text-white">Architecture</a>
+            <a href="#metrics" class="block px-3 py-2 text-gray-300 hover:text-white">Metrics</a>
+            <a href="#pricing" class="block px-3 py-2 text-gray-300 hover:text-white">Pricing</a>
+            <div class="pt-3 border-t border-gray-800 flex flex-col gap-2">
+                <a href="mailto:contact@vuanalytics.me" class="w-full text-center py-2.5 rounded-lg bg-purple-600 text-white font-medium text-sm">Get Early Access</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-32 pb-20">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 pt-12 md:pt-16">
+            
+            <!-- Launch Badge -->
+            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full glass-panel border border-purple-500/30 text-xs text-purple-300 mb-8 animate-pulse shadow-inner">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Introducing VuAnalytics v1.0 • Next-Gen AI Data Intelligence</span>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+            </div>
+
+            <!-- Main Headline -->
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-[1.12]">
+                Transform Raw Data into <span class="gradient-text">Actionable Decisions</span> with Autonomous AI
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="mt-6 text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto font-normal leading-relaxed">
+                Phân tích dữ liệu tự động, tổng hợp truy vấn nâng cao và trích xuất báo cáo thông minh chỉ trong vài giây. Được tối ưu hoá trực tiếp bằng sức mạnh suy luận từ <strong class="text-amber-400 font-semibold">Claude API (Sonnet)</strong>.
+            </p>
+
+            <!-- Hero Action Buttons -->
+            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#demo" class="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-xl shadow-purple-600/25 transition-all duration-300 flex items-center justify-center gap-3">
+                    <i data-lucide="play" class="w-4 h-4 fill-white"></i>
+                    Interactive Demo
+                </a>
+                <a href="mailto:contact@vuanalytics.me?subject=Inquiry%20VuAnalytics%20Trial" class="w-full sm:w-auto px-8 py-4 rounded-xl font-medium text-gray-200 glass-panel hover:bg-white/10 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 border border-white/10">
+                    <i data-lucide="mail" class="w-4 h-4 text-sky-400"></i>
+                    Request API Access
+                </a>
+            </div>
+
+            <!-- Social stats bar -->
+            <div class="mt-12 flex flex-wrap justify-center items-center gap-8 text-xs text-gray-400 font-medium">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                    <span>Zero Data Training Policy</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-400"></i>
+                    <span>Sub-second Semantic Querying</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="lock" class="w-4 h-4 text-sky-400"></i>
+                    <span>SOC-2 & GDPR Compatible</span>
+                </div>
+            </div>
+
+            <!-- Live Simulator & Dashboard Visual -->
+            <div class="mt-16 relative mx-auto max-w-6xl">
+                <div class="rounded-2xl p-[1px] bg-gradient-to-b from-white/20 via-purple-500/20 to-transparent shadow-2xl shadow-purple-950/60">
+                    <div class="rounded-2xl bg-[#0C101A] border border-white/5 overflow-hidden text-left">
+                        
+                        <!-- Console Titlebar -->
+                        <div class="px-5 py-3.5 bg-[#090D15] border-b border-white/[0.06] flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+                                <span class="ml-3 text-xs font-mono text-gray-400 flex items-center gap-2">
+                                    <i data-lucide="database" class="w-3.5 h-3.5 text-purple-400"></i>
+                                    vuanalytics-workspace::prod-cluster
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-mono text-emerald-400 flex items-center gap-1.5 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Claude 3.5 Sonnet Connected
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Dashboard Grid Layout -->
+                        <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            
+                            <!-- KPI Analytics Card Column (Left 2 cols) -->
+                            <div class="lg:col-span-2 space-y-6">
+                                
+                                <!-- Stat Counters Row -->
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                    <div class="p-4 rounded-xl bg-gray-900/60 border border-white/5">
+                                        <div class="text-xs font-medium text-gray-400">Total Pipeline Value</div>
+                                        <div class="text-2xl font-bold text-white mt-1">$1,428,950</div>
+                                        <div class="text-[11px] text-emerald-400 flex items-center gap-1 mt-1 font-mono">
+                                            <i data-lucide="trending-up" class="w-3 h-3"></i> +24.8% vs last month
+                                        </div>
+                                    </div>
+                                    <div class="p-4 rounded-xl bg-gray-900/60 border border-white/5">
+                                        <div class="text-xs font-medium text-gray-400">Avg Decision Latency</div>
+                                        <div class="text-2xl font-bold text-white mt-1">420 ms</div>
+                                        <div class="text-[11px] text-sky-400 flex items-center gap-1 mt-1 font-mono">
+                                            <i data-lucide="zap" class="w-3 h-3"></i> 99.4% cache hit
+                                        </div>
+                                    </div>
+                                    <div class="p-4 rounded-xl bg-gray-900/60 border border-white/5">
+                                        <div class="text-xs font-medium text-gray-400">AI Synthesized Reports</div>
+                                        <div class="text-2xl font-bold text-white mt-1">1,894</div>
+                                        <div class="text-[11px] text-purple-400 flex items-center gap-1 mt-1 font-mono">
+                                            <i data-lucide="check-circle" class="w-3 h-3"></i> 100% verified queries
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Interactive Chart -->
+                                <div class="p-5 rounded-xl bg-gray-900/40 border border-white/5">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <div>
+                                            <h3 class="text-sm font-semibold text-white">Revenue & Churn Correlation Matrix</h3>
+                                            <p class="text-xs text-gray-400">Autonomous model anomaly detection</p>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <button id="refreshChartBtn" class="text-xs px-2.5 py-1 rounded bg-gray-800 text-gray-300 hover:text-white border border-gray-700/60 flex items-center gap-1">
+                                                <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Refresh
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="relative h-64 w-full">
+                                        <canvas id="heroAnalyticsChart"></canvas>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Live AI Agent Column (Right 1 col) -->
+                            <div class="flex flex-col justify-between p-5 rounded-xl bg-[#0A0E18] border border-white/5">
+                                <div>
+                                    <div class="flex items-center justify-between pb-3 border-b border-gray-800">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                                            <span class="text-xs font-bold text-gray-200">Claude Copilot Agent</span>
+                                        </div>
+                                        <span class="text-[10px] font-mono text-gray-400">Streaming mode</span>
+                                    </div>
+
+                                    <!-- AI Response Stream Box -->
+                                    <div id="aiResponseContainer" class="mt-4 space-y-3 text-xs leading-relaxed font-mono">
+                                        <div class="p-3 rounded-lg bg-gray-900/80 border border-purple-500/20 text-gray-300">
+                                            <span class="text-purple-400 font-semibold block mb-1">💡 Real-time Insight #491:</span>
+                                            Khách hàng tier Enterprise tăng thời lượng sử dụng thêm 32% sau khi bổ sung mô hình dự báo Sonnet. Tỷ lệ Churn dự kiến giảm xuống dưới 1.2% trong Q4.
+                                        </div>
+                                        <div class="p-3 rounded-lg bg-gray-900/40 border border-white/5 text-gray-400">
+                                            <span class="text-sky-400 font-semibold block mb-1">⚙️ Autonomous Query:</span>
+                                            <code>SELECT segment, SUM(mrr) FROM tenants GROUP BY 1 ORDER BY 2 DESC;</code>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons in AI widget -->
+                                <div class="mt-4 pt-3 border-t border-gray-800 space-y-2">
+                                    <div class="text-[11px] text-gray-400">Try Instant Queries:</div>
+                                    <div class="flex flex-wrap gap-1.5">
+                                        <button onclick="runSimulatedQuery('churn')" class="px-2.5 py-1 rounded bg-purple-900/30 text-purple-300 text-[10px] hover:bg-purple-800/40 border border-purple-500/30">
+                                            Churn Analysis
+                                        </button>
+                                        <button onclick="runSimulatedQuery('growth')" class="px-2.5 py-1 rounded bg-sky-900/30 text-sky-300 text-[10px] hover:bg-sky-800/40 border border-sky-500/30">
+                                            Q4 MRR Forecast
+                                        </button>
+                                        <button onclick="runSimulatedQuery('anomaly')" class="px-2.5 py-1 rounded bg-emerald-900/30 text-emerald-300 text-[10px] hover:bg-emerald-800/40 border border-emerald-500/30">
+                                            Anomaly Detector
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="demo" class="mt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-semibold tracking-wider text-purple-400 uppercase bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+                    Live Demo Playground
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-white mt-4">
+                    Experience Claude Sonnet at Work
+                </h2>
+                <p class="text-gray-400 mt-3 text-sm sm:text-base">
+                    Nhập câu hỏi bằng ngôn ngữ tự nhiên của bạn. VuAnalytics sẽ phân tích cấu trúc, tự động tạo truy vấn SQL và tổng hợp dữ liệu thời gian thực.
+                </p>
+            </div>
+
+            <!-- Interactive Prompt Simulator Panel -->
+            <div class="max-w-4xl mx-auto glass-panel rounded-2xl p-6 sm:p-8 border border-white/10 shadow-2xl relative">
+                
+                <!-- Prompt Input Bar -->
+                <div class="relative flex flex-col sm:flex-row items-center gap-3">
+                    <div class="relative w-full">
+                        <i data-lucide="message-square" class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input id="userPromptInput" type="text" 
+                               value="Phân tích nguyên nhân khách hàng rời bỏ (churn rate) trong 30 ngày qua và đề xuất giải pháp"
+                               placeholder="Hỏi bất kỳ điều gì về dữ liệu kinh doanh của bạn..." 
+                               class="w-full bg-[#080C14] text-gray-100 pl-12 pr-4 py-4 rounded-xl border border-gray-700/60 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 text-sm font-medium">
+                    </div>
+                    <button id="sendPromptBtn" class="w-full sm:w-auto px-6 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-purple-600/20 transition-all">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-amber-300"></i>
+                        Generate Insights
+                    </button>
+                </div>
+
+                <!-- Fast Preset Chips -->
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                    <span class="text-xs text-gray-400 font-medium">Gợi ý mẫu:</span>
+                    <button class="preset-btn text-xs px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-colors" data-prompt="Dự báo chỉ số MRR và ARR tháng tới dựa trên xu hướng Q3">
+                        📈 Dự báo MRR & ARR
+                    </button>
+                    <button class="preset-btn text-xs px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-colors" data-prompt="Xác định top 5 tính năng mang lại tỷ lệ giữ chân khách hàng cao nhất">
+                        ⭐ Top tính năng giữ chân
+                    </button>
+                    <button class="preset-btn text-xs px-3 py-1 rounded-full bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-colors" data-prompt="Tổng hợp chi phí vận hành API Claude và tối ưu hóa token caching">
+                        ⚡ Tối ưu chi phí API
+                    </button>
+                </div>
+
+                <!-- Simulation Output Box -->
+                <div class="mt-8 p-6 rounded-xl bg-[#090D15] border border-gray-800 text-left">
+                    <div class="flex items-center justify-between pb-3 border-b border-gray-800/80">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="terminal" class="w-4 h-4 text-sky-400"></i>
+                            <span class="text-xs font-mono text-gray-300">Claude 3.5 Sonnet Response Stream</span>
+                        </div>
+                        <div id="simStatus" class="text-xs font-mono text-emerald-400 flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Idle / Ready
+                        </div>
+                    </div>
+
+                    <div id="typewriterOutput" class="mt-4 text-sm text-gray-300 font-sans leading-relaxed min-h-[140px] whitespace-pre-line">
+Nhấn "Generate Insights" để bắt đầu nhận phân tích chuyên sâu tự động được hỗ trợ bởi thuật toán suy luận đa bước của Claude Sonnet.
+                    </div>
+
+                    <!-- Metrics generated from AI -->
+                    <div id="dynamicMetricGrid" class="mt-6 pt-4 border-t border-gray-800 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="p-3 rounded-lg bg-gray-900/60 border border-white/5">
+                            <div class="text-[11px] text-gray-400">Confidence Score</div>
+                            <div id="valConfidence" class="text-lg font-bold text-emerald-400 mt-0.5">99.8%</div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-900/60 border border-white/5">
+                            <div class="text-[11px] text-gray-400">Estimated Churn Impact</div>
+                            <div id="valImpact" class="text-lg font-bold text-rose-400 mt-0.5">-3.4%</div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-900/60 border border-white/5">
+                            <div class="text-[11px] text-gray-400">Token Cost Saved</div>
+                            <div id="valTokens" class="text-lg font-bold text-sky-400 mt-0.5">68.2%</div>
+                        </div>
+                        <div class="p-3 rounded-lg bg-gray-900/60 border border-white/5">
+                            <div class="text-[11px] text-gray-400">Query Latency</div>
+                            <div id="valLatency" class="text-lg font-bold text-amber-400 mt-0.5">380ms</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="features" class="mt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-semibold tracking-wider text-sky-400 uppercase bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20">
+                    Engineered For Modern Teams
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-bold tracking-tight text-white mt-4">
+                    Why Companies Scale with VuAnalytics
+                </h2>
+                <p class="text-gray-400 mt-4 text-base">
+                    Sự kết hợp hoàn hảo giữa hạ tầng phân tích dữ liệu quy mô lớn và trí tuệ nhân tạo thế hệ mới nhất từ Anthropic.
+                </p>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Card 1 -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="brain-circuit" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Deep Reasoning Engine</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Tận dụng mô hình Claude 3.5 Sonnet để suy luận chuỗi dữ liệu phức tạp, phát hiện tương quan ẩn và giải thích lý do đằng sau các con số.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                    <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="database" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Autonomous Connectors</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Tích hợp liền mạch với PostgreSQL, Snowflake, BigQuery và ClickHouse. Tự động ánh xạ Schema mà không cần cấu hình ETL phức tạp.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="shield" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Enterprise Privacy</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Chính sách Zero-Data Retention đảm bảo dữ liệu kinh doanh độc quyền không bao giờ bị sử dụng để đào tạo mô hình công cộng.
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="glass-card p-6 rounded-2xl relative overflow-hidden group">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-5 group-hover:scale-110 transition-transform">
+                        <i data-lucide="file-text" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Executive Reports</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Tự động sinh báo cáo thuyết trình (PDF/Notion/Slack) tóm lược chỉ số KPI quan trọng gửi thẳng cho hội đồng quản trị mỗi sáng thứ Hai.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="architecture" class="mt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-panel rounded-3xl p-8 sm:p-12 border border-white/10 relative overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                    <div>
+                        <span class="text-xs font-semibold tracking-wider text-purple-400 uppercase bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
+                            Technical Pipeline
+                        </span>
+                        <h2 class="text-3xl sm:text-4xl font-bold text-white mt-4 tracking-tight">
+                            Hạ tầng AI Data Pipeline được xây dựng cho tốc độ và độ chính xác
+                        </h2>
+                        <p class="text-gray-400 mt-4 text-sm sm:text-base leading-relaxed">
+                            Mỗi câu lệnh đều trải qua 4 lớp kiểm định: Phân tích ngữ nghĩa $\rightarrow$ Xác thực Schema $\rightarrow$ Chạy sandbox thực thi an toàn $\rightarrow$ Tổng hợp báo cáo cùng mô hình Claude Sonnet.
+                        </p>
+
+                        <div class="mt-8 space-y-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 mt-0.5">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-white">Prompt Caching Optimization</h4>
+                                    <p class="text-xs text-gray-400">Giảm chi phí API đến 80% và giảm độ trễ phản hồi tới 2.5x nhờ tính năng Prompt Caching của Anthropic.</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4">
+                                <div class="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
+                                    <i data-lucide="check" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-white">Automated SQL Verification</h4>
+                                    <p class="text-xs text-gray-400">Khử bỏ 100% ảo giác (hallucination) trước khi gửi truy vấn thực tế tới cơ sở dữ liệu của bạn.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code & Pipeline Representation -->
+                    <div class="rounded-xl bg-[#090D16] border border-white/10 p-5 font-mono text-xs text-gray-300 space-y-3 shadow-inner">
+                        <div class="flex items-center justify-between text-gray-500 border-b border-gray-800 pb-2">
+                            <span>pipeline_config.ts</span>
+                            <span class="text-emerald-400">status: healthy</span>
+                        </div>
+                        <p class="text-purple-400"><span class="text-sky-400">import</span> { Anthropic } <span class="text-sky-400">from</span> '@anthropic-ai/sdk';</p>
+                        <p class="text-purple-400"><span class="text-sky-400">import</span> { VuSemanticEngine } <span class="text-sky-400">from</span> '@vuanalytics/core';</p>
+                        <div class="text-gray-400 pl-4 border-l-2 border-purple-500/40 space-y-1">
+                            <p><span class="text-amber-400">const</span> client = <span class="text-amber-400">new</span> Anthropic();</p>
+                            <p><span class="text-amber-400">const</span> response = <span class="text-sky-400">await</span> client.messages.create({</p>
+                            <p class="pl-4">model: <span class="text-emerald-300">"claude-3-5-sonnet-20241022"</span>,</p>
+                            <p class="pl-4">max_tokens: <span class="text-amber-300">4096</span>,</p>
+                            <p class="pl-4">tools: VuSemanticEngine.schemaDefinitions(),</p>
+                            <p class="pl-4">messages: [{ role: <span class="text-emerald-300">"user"</span>, content: prompt }]</p>
+                            <p>});</p>
+                        </div>
+                        <p class="text-gray-500 pt-2 border-t border-gray-800">// Validated output rendered to VuAnalytics Dashboard</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="mt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-semibold tracking-wider text-amber-400 uppercase bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                    Transparent Pricing
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-bold tracking-tight text-white mt-4">
+                    Kế hoạch linh hoạt cho mọi quy mô doanh nghiệp
+                </h2>
+                <p class="text-gray-400 mt-4 text-base">
+                    Khởi động miễn phí hôm nay. Nâng cấp khi khối lượng dữ liệu và nhu cầu của bạn tăng trưởng.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Starter Tier -->
+                <div class="glass-card p-8 rounded-3xl border border-white/10 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Starter</h3>
+                        <p class="text-xs text-gray-400 mt-1">Dành cho cá nhân & nhóm khởi nghiệp thử nghiệm</p>
+                        <div class="text-4xl font-extrabold text-white mt-6">$0 <span class="text-sm font-normal text-gray-400">/ tháng</span></div>
+                        <ul class="mt-6 space-y-3 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> 100 câu hỏi AI / tháng</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Kết nối 1 Database hoặc CSV</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-purple-400"></i> Báo cáo tóm tắt tiêu chuẩn</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:contact@vuanalytics.me?subject=Starter%20Registration" class="mt-8 w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm text-center block transition-colors">
+                        Bắt đầu miễn phí
+                    </a>
+                </div>
+
+                <!-- Pro Tier (Popular) -->
+                <div class="glass-card p-8 rounded-3xl border-2 border-purple-500/50 bg-gradient-to-b from-purple-950/20 to-transparent flex flex-col justify-between relative shadow-2xl shadow-purple-900/30">
+                    <div class="absolute -top-3.5 right-6 px-3 py-1 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-[11px] font-bold text-white uppercase tracking-wider">
+                        Phổ biến nhất
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Startup Pro</h3>
+                        <p class="text-xs text-gray-400 mt-1">Dành cho công ty tăng trưởng nhanh</p>
+                        <div class="text-4xl font-extrabold text-white mt-6">$79 <span class="text-sm font-normal text-gray-400">/ tháng</span></div>
+                        <ul class="mt-6 space-y-3 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Không giới hạn câu hỏi Claude Sonnet</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Kết nối không giới hạn nguồn Data</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Tự động hóa gửi báo cáo qua Slack / Teams</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-emerald-400"></i> Tối ưu Prompt Caching siêu tốc</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:contact@vuanalytics.me?subject=Pro%20Upgrade" class="mt-8 w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold text-sm text-center block shadow-lg shadow-purple-600/30 transition-all">
+                        Dùng thử 14 ngày
+                    </a>
+                </div>
+
+                <!-- Enterprise Tier -->
+                <div class="glass-card p-8 rounded-3xl border border-white/10 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Enterprise</h3>
+                        <p class="text-xs text-gray-400 mt-1">Hạ tầng riêng biệt & Tuân thủ bảo mật khắt khe</p>
+                        <div class="text-4xl font-extrabold text-white mt-6">Tuỳ chỉnh</div>
+                        <ul class="mt-6 space-y-3 text-sm text-gray-300">
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sky-400"></i> Triển khai Private Cloud / On-Premise</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sky-400"></i> SLA 99.99% độ sẵn sàng</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sky-400"></i> Hỗ trợ kỹ sư AI chuyên biệt 24/7</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:contact@vuanalytics.me?subject=Enterprise%20Inquiry" class="mt-8 w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-sm text-center block transition-colors">
+                        Liên hệ tư vấn
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="rounded-3xl bg-gradient-to-r from-purple-900/60 via-indigo-900/40 to-sky-900/40 border border-purple-500/30 p-10 sm:p-16 text-center relative overflow-hidden">
+                <div class="relative z-10 max-w-3xl mx-auto">
+                    <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+                        Sẵn sàng bứt phá tiềm năng dữ liệu với VuAnalytics?
+                    </h2>
+                    <p class="mt-5 text-gray-300 text-sm sm:text-base leading-relaxed">
+                        Tham gia hàng trăm kỹ sư và chuyên viên dữ liệu khai thác sức mạnh AI để ra quyết định kinh doanh chính xác mỗi ngày.
+                    </p>
+                    <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <a href="mailto:contact@vuanalytics.me?subject=VuAnalytics%20Early%20Access" class="px-8 py-4 rounded-xl font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur transition-all flex items-center gap-2">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                            Liên hệ: contact@vuanalytics.me
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="mt-20 border-t border-white/[0.08] bg-[#070A11]/90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                <div class="md:col-span-2 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-sky-400 flex items-center justify-center text-white">
+                            <i data-lucide="cpu" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-lg font-bold text-white">VuAnalytics</span>
+                    </div>
+                    <p class="text-sm text-gray-400 max-w-sm">
+                        Nền tảng trí tuệ dữ liệu và phân tích tự động thế hệ mới. Vận hành bởi mô hình Claude Sonnet của Anthropic.
+                    </p>
+                    <div class="text-xs text-gray-500">
+                        Official Domain: <a href="https://vuanalytics.me" class="text-purple-400 hover:underline">https://vuanalytics.me</a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-200 uppercase tracking-wider mb-4">Sản phẩm</h4>
+                    <ul class="space-y-2.5 text-sm text-gray-400">
+                        <li><a href="#features" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#demo" class="hover:text-white transition-colors">AI Live Simulation</a></li>
+                        <li><a href="#architecture" class="hover:text-white transition-colors">Prompt Caching</a></li>
+                        <li><a href="#pricing" class="hover:text-white transition-colors">Pricing & Plans</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-semibold text-gray-200 uppercase tracking-wider mb-4">Liên hệ</h4>
+                    <ul class="space-y-2.5 text-sm text-gray-400">
+                        <li><a href="mailto:contact@vuanalytics.me" class="hover:text-white transition-colors">contact@vuanalytics.me</a></li>
+                        <li><a href="https://platform.claude.com" target="_blank" class="hover:text-white transition-colors">Claude Console</a></li>
+                        <li><span class="text-gray-500">Ho Chi Minh City, Vietnam</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+                <p>© 2026 VuAnalytics. All rights reserved.</p>
+                <div class="flex items-center space-x-6">
+                    <a href="#" class="hover:text-gray-400">Privacy Policy</a>
+                    <a href="#" class="hover:text-gray-400">Terms of Service</a>
+                    <a href="#" class="hover:text-gray-400">Security Overview</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mobile Menu Drawer Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Initialize Hero Chart with Chart.js
+        let heroChart;
+        function initChart() {
+            const ctx = document.getElementById('heroAnalyticsChart').getContext('2d');
+            
+            // Gradient fill
+            const purpleGradient = ctx.createLinearGradient(0, 0, 0, 240);
+            purpleGradient.addColorStop(0, 'rgba(139, 92, 246, 0.35)');
+            purpleGradient.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
+
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, 240);
+            skyGradient.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+            skyGradient.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+            heroChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [
+                        {
+                            label: 'ARR Growth ($k)',
+                            data: [32, 45, 58, 72, 85, 110, 135, 168, 204, 258],
+                            borderColor: '#8B5CF6',
+                            backgroundColor: purpleGradient,
+                            borderWidth: 2.5,
+                            tension: 0.35,
+                            fill: true,
+                            pointBackgroundColor: '#8B5CF6',
+                            pointRadius: 3
+                        },
+                        {
+                            label: 'Customer Retention (%)',
+                            data: [82, 84, 85, 87, 89, 91, 93, 95, 96, 98.2],
+                            borderColor: '#38BDF8',
+                            backgroundColor: skyGradient,
+                            borderWidth: 2.5,
+                            tension: 0.35,
+                            fill: true,
+                            pointBackgroundColor: '#38BDF8',
+                            pointRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#94A3B8',
+                                font: { family: 'Plus Jakarta Sans', size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#111726',
+                            borderColor: '#374151',
+                            borderWidth: 1,
+                            titleColor: '#F8FAFC',
+                            bodyColor: '#E2E8F0'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                            ticks: { color: '#64748B', font: { family: 'Plus Jakarta Sans', size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                            ticks: { color: '#64748B', font: { family: 'Plus Jakarta Sans', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Refresh chart with slight randomization for demo interactivity
+        document.getElementById('refreshChartBtn').addEventListener('click', () => {
+            if (heroChart) {
+                heroChart.data.datasets[0].data = heroChart.data.datasets[0].data.map(val => Math.round(val * (0.95 + Math.random() * 0.1)));
+                heroChart.update();
+            }
+        });
+
+        // Initialize chart after load
+        window.addEventListener('DOMContentLoaded', () => {
+            initChart();
+        });
+
+        const userPromptInput = document.getElementById('userPromptInput');
+        const sendPromptBtn = document.getElementById('sendPromptBtn');
+        const typewriterOutput = document.getElementById('typewriterOutput');
+        const simStatus = document.getElementById('simStatus');
+
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        presetButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                userPromptInput.value = btn.getAttribute('data-prompt');
+                triggerSimulation();
+            });
+        });
+
+        sendPromptBtn.addEventListener('click', () => {
+            triggerSimulation();
+        });
+
+        function triggerSimulation() {
+            const prompt = userPromptInput.value.trim();
+            if (!prompt) return;
+
+            simStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> Claude Sonnet is synthesizing...';
+            simStatus.className = 'text-xs font-mono text-amber-400 flex items-center gap-1.5';
+            typewriterOutput.innerHTML = '';
+
+            const simulatedResponse = `[BÁO CÁO PHÂN TÍCH VUANALYTICS - ĐƯỢC XỬ LÝ BỞI CLAUDE 3.5 SONNET]
+-------------------------------------------------------------------------
+1. Phát hiện trọng yếu (Key Findings):
+• Chỉ số Churn tập trung ở phân khúc Self-serve với tỷ lệ rời bỏ 3.8% trong 14 ngày đầu kích hoạt.
+• Khách hàng có sử dụng tính năng "Automated Report Export" đạt tỷ lệ giữ chân 96.4% sau 60 ngày.
+
+2. Đề xuất hành động theo thời gian thực (Actionable Recommendations):
+• Kích hoạt quy trình onboarding tự động gửi hướng dẫn kết nối database trong 24h đầu.
+• Áp dụng Prompt Caching cho các truy vấn bảng điều khiển hàng ngày để giảm thời gian chờ xuống dưới 400ms.
+
+3. Ước tính tác động kinh doanh (Business Impact):
+• Tăng thêm +$14,200 MRR dự kiến vào tháng kế tiếp nhờ giảm 1.8% tỷ lệ hủy gói đăng ký.`;
+
+            let index = 0;
+            const timer = setInterval(() => {
+                if (index < simulatedResponse.length) {
+                    typewriterOutput.textContent += simulatedResponse.charAt(index);
+                    index++;
+                } else {
+                    clearInterval(timer);
+                    simStatus.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400"></span> Synthesis Complete (380ms)';
+                    simStatus.className = 'text-xs font-mono text-emerald-400 flex items-center gap-1.5';
+                    
+                    // Slightly randomize metric values to show responsiveness
+                    document.getElementById('valConfidence').innerText = (99.2 + Math.random() * 0.7).toFixed(1) + '%';
+                    document.getElementById('valLatency').innerText = Math.floor(320 + Math.random() * 80) + 'ms';
+                }
+            }, 12);
+        }
+
+        // Quick simulation triggers from the mini-widget
+        function runSimulatedQuery(type) {
+            if (type === 'churn') {
+                userPromptInput.value = "Phân tích nguyên nhân biến động chỉ số Churn Rate tuần này";
+            } else if (type === 'growth') {
+                userPromptInput.value = "Dự báo tăng trưởng MRR và ARR trong quý 4";
+            } else if (type === 'anomaly') {
+                userPromptInput.value = "Quét bất thường trong lượt truy vấn dữ liệu bất thường hôm nay";
+            }
+            triggerSimulation();
+        }
+    </script>
+</body>
+</html>
