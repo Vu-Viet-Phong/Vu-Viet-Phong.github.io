@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, Bot, Sliders, Activity, Cpu, Database, User } from 'lucide-react';
+import { Search, Bot, Sliders, Activity, Cpu, Database, User, Server, WifiOff } from 'lucide-react';
+import { apiClient } from '../api/client';
 
 type GraphRAGStage = 'Query' | 'Vector' | 'Graph' | 'Fusion' | 'Rerank' | 'Answer';
 const stages: GraphRAGStage[] = ['Query', 'Vector', 'Graph', 'Fusion', 'Rerank', 'Answer'];
@@ -38,6 +39,31 @@ export const AILab = () => {
   const [arenaModel1, setArenaModel1] = useState<'MF'|'NGCF'|'LightGCN'|'VBPR'>('LightGCN');
   const [arenaModel2, setArenaModel2] = useState<'MF'|'NGCF'|'LightGCN'|'VBPR'|'None'>('None');
   const [topK, setTopK] = useState(5);
+  
+  // API State
+  const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
+  const [apiMode, setApiMode] = useState<string>('DEMO MODE');
+  const [apiRecommendations1, setApiRecommendations1] = useState<any[]>([]);
+  const [apiRecommendations2, setApiRecommendations2] = useState<any[]>([]);
+  const [isLoadingRecs, setIsLoadingRecs] = useState(false);
+
+  useEffect(() => {
+    const checkApi = async () => {
+      try {
+        // Just checking model status route
+        const res = await apiClient.get('/models');
+        if (res && res.status) {
+          setApiStatus('online');
+          setApiMode(res.status.includes('Simulation') ? 'DEMO MODE (Backend)' : 'LIVE INFERENCE');
+        } else {
+          setApiStatus('offline');
+        }
+      } catch (e) {
+        setApiStatus('offline');
+      }
+    };
+    checkApi();
+  }, []);
 
   const runSimulation = () => {
     setIsSimulating(true);
@@ -83,7 +109,7 @@ export const AILab = () => {
   }, [activeStage, selectedQueryIdx]);
 
   const generateRecommendations = (model: string, profile: any) => {
-    // Deterministic mock generation
+    // Deterministic mock generation (Fallback)
     const seed = model.length + profile.name.length;
     return [...Array(topK)].map((_, i) => ({
       id: 101 + i + seed,
@@ -92,6 +118,31 @@ export const AILab = () => {
       category: i % 2 === 0 ? 'Apparel' : 'Accessories'
     }));
   };
+
+  useEffect(() => {
+    if (apiStatus !== 'online') return;
+    
+    const fetchRecs = async () => {
+      setIsLoadingRecs(true);
+      try {
+        const res1 = await apiClient.post('/recommendations', { user_id: activeProfile.id, model: arenaModel1, top_k: topK });
+        setApiRecommendations1(res1.items || []);
+        
+        if (arenaModel2 !== 'None') {
+          const res2 = await apiClient.post('/recommendations', { user_id: activeProfile.id, model: arenaModel2, top_k: topK });
+          setApiRecommendations2(res2.items || []);
+        } else {
+          setApiRecommendations2([]);
+        }
+      } catch (e) {
+        console.warn("API fallback to local mock");
+        setApiStatus('offline');
+      } finally {
+        setIsLoadingRecs(false);
+      }
+    };
+    fetchRecs();
+  }, [apiStatus, activeProfile, arenaModel1, arenaModel2, topK]);
 
   const renderInspectorContent = () => {
     if (!currentStageData) return null;
@@ -356,17 +407,25 @@ export const AILab = () => {
                 <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                   <Bot className="w-4 h-4 text-primary" /> Recommendation Inference
                 </h3>
-                <span className="px-2.5 py-1 rounded bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[9px] font-mono uppercase tracking-wider">
-                  Simulation Mode
-                </span>
+                <div className="flex items-center gap-2">
+                  {apiStatus === 'online' ? (
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-green-500/10 border border-green-500/20 text-green-500 text-[9px] font-mono uppercase tracking-wider">
+                      <Server className="w-3 h-3" /> {apiMode}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[9px] font-mono uppercase tracking-wider" title="Backend unreachable. Using local deterministic fallback.">
+                      <WifiOff className="w-3 h-3" /> Local Demo
+                    </span>
+                  )}
+                </div>
               </div>
               
               <div className={`grid gap-6 ${arenaModel2 !== 'None' ? 'grid-cols-2' : 'grid-cols-1 max-w-lg mx-auto'}`}>
                 {/* Model 1 Results */}
                 <div>
                   <h4 className="text-xs font-mono text-primary uppercase mb-4 text-center border-b border-surfaceHighlight pb-2">{arenaModel1} Ranking</h4>
-                  <div className="space-y-3">
-                    {generateRecommendations(arenaModel1, activeProfile).map((item, i) => (
+                  <div className={`space-y-3 ${isLoadingRecs ? 'opacity-50' : ''}`}>
+                    {(apiStatus === 'online' && apiRecommendations1.length > 0 ? apiRecommendations1 : generateRecommendations(arenaModel1, activeProfile)).map((item, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-surface/40 border border-surfaceHighlight hover:border-primary/50 transition-colors group">
                         <div className="w-8 h-8 rounded bg-surface flex items-center justify-center font-mono text-[10px] text-textMuted group-hover:text-primary">
                           #{i + 1}
@@ -384,8 +443,8 @@ export const AILab = () => {
                 {arenaModel2 !== 'None' && (
                   <div>
                     <h4 className="text-xs font-mono text-secondary uppercase mb-4 text-center border-b border-surfaceHighlight pb-2">{arenaModel2} Ranking</h4>
-                    <div className="space-y-3">
-                      {generateRecommendations(arenaModel2, activeProfile).map((item, i) => (
+                    <div className={`space-y-3 ${isLoadingRecs ? 'opacity-50' : ''}`}>
+                      {(apiStatus === 'online' && apiRecommendations2.length > 0 ? apiRecommendations2 : generateRecommendations(arenaModel2, activeProfile)).map((item, i) => (
                         <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-surface/40 border border-surfaceHighlight hover:border-secondary/50 transition-colors group">
                           <div className="w-8 h-8 rounded bg-surface flex items-center justify-center font-mono text-[10px] text-textMuted group-hover:text-secondary">
                             #{i + 1}
