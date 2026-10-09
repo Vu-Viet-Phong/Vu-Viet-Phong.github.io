@@ -29,3 +29,15 @@ screenshot.js
 screenshot_*.png
 scaffold.py
 check_errors.js
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.pytest_cache/
+.env
