@@ -9,7 +9,8 @@ mmrec_adapter = MMRecAdapter(use_mock=True)
 def get_models():
     return {
         "models": ["MF", "NGCF", "LightGCN", "VBPR"],
-        "status": "Simulation Mode (Real checkpoints missing)"
+        "status": "Simulation Mode (Real checkpoints missing)" if mmrec_adapter.use_mock else "Live Inference Active",
+        "live": not mmrec_adapter.use_mock
     }
 
 @router.get("/recommendation/profiles", response_model=list[Profile])
