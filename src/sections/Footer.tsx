@@ -27,7 +27,7 @@ export const Footer = () => {
       
       <div className="container mx-auto px-6 mt-8 pt-8 border-t border-surfaceHighlight/50 flex flex-col md:flex-row justify-between items-center text-xs text-textMuted">
         <p>© {new Date().getFullYear()} Vu Viet Phong. All rights reserved.</p>
-        <p className="font-mono mt-2 md:mt-0">vuanalytics.me</p>
+        <p className="font-mono mt-2 md:mt-0">vuanalytics.me <span className="px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[10px] tracking-wider uppercase">Build V3.1</span></p>
       </div>
     </footer>
   );
