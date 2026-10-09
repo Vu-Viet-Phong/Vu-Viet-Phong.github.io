@@ -313,17 +313,19 @@ export const AILab = () => {
             </div>
 
             {/* Right: Inspector */}
-            <div className="lg:col-span-5 bg-[#05080f] rounded-2xl border border-surfaceHighlight p-6 flex flex-col shadow-2xl">
-              <h3 className="text-sm font-semibold text-white mb-6 flex items-center gap-2 border-b border-surfaceHighlight pb-4">
-                <Database className="w-4 h-4 text-secondary" /> Evidence Inspector
+            <div className="lg:col-span-5 bg-[#05080f]/90 backdrop-blur-md rounded-2xl border border-secondary/30 p-6 flex flex-col shadow-[0_0_30px_rgba(151,136,239,0.1)] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-[40px] pointer-events-none" />
+              <h3 className="text-sm font-bold text-white mb-6 flex items-center justify-between border-b border-surfaceHighlight pb-4 relative z-10">
+                <span className="flex items-center gap-2"><Database className="w-4 h-4 text-secondary" /> Evidence Inspector</span>
+                <span className="text-[9px] font-mono bg-secondary/10 text-secondary px-2 py-0.5 rounded border border-secondary/20">TRACE: {Math.random().toString(36).substring(2, 8).toUpperCase()}</span>
               </h3>
               
-              <div className="flex-1 space-y-6">
+              <div className="flex-1 space-y-6 relative z-10">
                 <div>
-                  <h4 className="text-[10px] font-mono text-secondary uppercase mb-2">Stage: {stageDataTemplate[activeStage].title}</h4>
+                  <h4 className="text-[10px] font-mono text-secondary uppercase mb-2 tracking-widest">Stage: {stageDataTemplate[activeStage].title}</h4>
                 </div>
 
-                <div className="bg-surface/50 rounded-xl border border-surfaceHighlight p-4">
+                <div className="bg-[#0a0f18] rounded-xl border border-surfaceHighlight/50 p-5 shadow-inner">
                   {renderInspectorContent()}
                 </div>
               </div>

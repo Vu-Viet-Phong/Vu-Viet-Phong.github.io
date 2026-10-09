@@ -137,25 +137,26 @@ export const ProductShowcase = () => {
                   <div 
                     key={p.id}
                     onClick={() => setSelectedItemId(isSelected ? null : p.id)}
-                    className={`flex flex-col gap-4 p-4 rounded-2xl cursor-pointer transition-all border ${isSelected ? 'bg-surface border-primary shadow-lg' : 'bg-surface/50 border-surfaceHighlight/50 hover:border-surfaceHighlight'}`}
+                    className={`flex flex-col gap-4 p-5 rounded-2xl cursor-pointer transition-all duration-300 border backdrop-blur-sm ${isSelected ? 'bg-primary/5 border-primary shadow-[0_0_30px_rgba(75,213,232,0.15)] scale-[1.02]' : 'bg-surface/50 border-surfaceHighlight/50 hover:border-surfaceHighlight hover:bg-surface/80'}`}
                   >
-                    <div className="flex gap-4">
-                      <div className="w-16 h-20 rounded-xl shrink-0 flex flex-col items-center justify-center border border-white/10" style={{ backgroundColor: p.color }}>
-                         <Hexagon className="w-6 h-6 text-black/20" />
+                    <div className="flex gap-5">
+                      <div className="w-20 h-24 rounded-xl shrink-0 flex flex-col items-center justify-center border border-white/10 shadow-inner relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${p.color}, #1a1a1a)` }}>
+                         <div className="absolute inset-0 bg-black/20" />
+                         <Hexagon className="w-8 h-8 text-white/40 z-10 drop-shadow-md" />
                       </div>
                       
-                      <div className="flex-1 py-1">
+                      <div className="flex-1 py-1 flex flex-col justify-between">
                         <div className="flex justify-between items-start mb-2">
-                          <h4 className={`font-semibold text-sm ${isSelected ? 'text-primary' : 'text-white'}`}>{p.name}</h4>
-                          <div className="flex flex-col items-end">
-                            <span className={`text-xs font-bold ${p.score > 80 ? 'text-green-400' : p.score > 40 ? 'text-yellow-400' : 'text-red-400'}`}>{p.score}%</span>
-                            <span className="text-[9px] text-textMuted uppercase font-mono">Match</span>
+                          <h4 className={`font-bold text-sm tracking-wide ${isSelected ? 'text-primary' : 'text-white'}`}>{p.name}</h4>
+                          <div className="flex flex-col items-end bg-background/50 px-2 py-1 rounded-lg border border-white/5">
+                            <span className={`text-sm font-black tracking-tighter ${p.score > 80 ? 'text-green-400' : p.score > 40 ? 'text-yellow-400' : 'text-red-400'}`}>{p.score}%</span>
+                            <span className="text-[8px] text-textMuted uppercase font-mono tracking-widest">Match</span>
                           </div>
                         </div>
                         
-                        <div className="flex flex-wrap gap-1.5 mt-2">
+                        <div className="flex flex-wrap gap-1.5 mt-auto">
                           {Object.values(p.attr).map(a => (
-                            <span key={a} className="px-1.5 py-0.5 rounded bg-[#0a0f18] border border-surfaceHighlight text-[10px] text-slate-400">{a}</span>
+                            <span key={a} className="px-2 py-1 rounded-md bg-background/80 border border-surfaceHighlight text-[10px] text-slate-300 shadow-sm">{a}</span>
                           ))}
                         </div>
                       </div>
@@ -163,27 +164,28 @@ export const ProductShowcase = () => {
 
                     {/* Explanation Panel */}
                     {isSelected && (
-                      <div className="pt-3 border-t border-surfaceHighlight/50 animate-fade-in-up text-xs space-y-2">
-                        <div className="text-slate-300 font-medium mb-2">Detailed Relevance Breakdown:</div>
+                      <div className="pt-4 border-t border-primary/20 animate-fade-in-up text-xs space-y-3">
+                        <div className="text-slate-300 font-semibold mb-1 uppercase tracking-wider text-[10px]">Reasoning Engine:</div>
                         {p.matches.length > 0 && (
-                          <div className="flex items-start gap-2">
+                          <div className="flex items-start gap-2 bg-green-500/10 border border-green-500/20 p-2.5 rounded-lg">
                             <CheckCircle2 className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
-                            <span className="text-slate-300">
-                              <strong className="text-green-400/90 font-medium">Matches:</strong> {p.matches.join(', ')}
+                            <span className="text-slate-200 leading-relaxed">
+                              <strong className="text-green-400 font-bold uppercase text-[10px] tracking-wider mr-1">Matches:</strong> {p.matches.join(', ')}
                             </span>
                           </div>
                         )}
                         {p.mismatches.length > 0 && (
-                          <div className="flex items-start gap-2">
+                          <div className="flex items-start gap-2 bg-red-500/10 border border-red-500/20 p-2.5 rounded-lg">
                             <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                            <span className="text-slate-300">
-                              <strong className="text-red-400/90 font-medium">Fails on:</strong> {p.mismatches.join('; ')}
+                            <span className="text-slate-200 leading-relaxed">
+                              <strong className="text-red-400 font-bold uppercase text-[10px] tracking-wider mr-1">Fails on:</strong> {p.mismatches.join('; ')}
                             </span>
                           </div>
                         )}
                         {p.score < 50 && (
-                          <div className="mt-2 p-2 rounded bg-red-400/10 border border-red-400/20 text-red-300/90 text-[11px]">
-                            Conclusion: This product is poorly aligned with the query intent and would normally be filtered out.
+                          <div className="mt-2 p-2.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-xs font-medium flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                            System filtered this out due to low relevance threshold.
                           </div>
                         )}
                       </div>

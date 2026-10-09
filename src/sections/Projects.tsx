@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Github, Activity, ChevronRight, Layers, Layout, Database, ArrowRight, BarChart3, Settings } from 'lucide-react';
 
 type ModelType = 'MF' | 'NGCF' | 'LightGCN' | 'VBPR';
@@ -105,13 +105,13 @@ export const Projects = () => {
                 
                 {activeTab === 'architecture' && (
                   <>
-                    <div className="flex justify-between items-center bg-surface/50 p-2 rounded-lg border border-surfaceHighlight">
-                      <div className="flex gap-1">
+                    <div className="flex flex-wrap justify-between items-center bg-surface/50 p-2 rounded-lg border border-surfaceHighlight gap-4">
+                      <div className="flex gap-1 flex-wrap">
                         {(['MF', 'NGCF', 'LightGCN', 'VBPR'] as ModelType[]).map((m) => (
                           <button
                             key={m}
                             onClick={() => setActiveModel(m)}
-                            className={`px-4 py-1.5 rounded-md text-xs font-mono transition-all ${activeModel === m ? 'bg-primary/20 text-primary font-bold border border-primary/30' : 'text-textMuted hover:text-white'}`}
+                            className={`px-4 py-1.5 rounded-md text-xs font-mono transition-all ${activeModel === m ? 'bg-primary/20 text-primary font-bold border border-primary/30 shadow-[0_0_10px_rgba(75,213,232,0.2)]' : 'text-textMuted hover:text-white'}`}
                           >
                             {m}
                           </button>
@@ -119,26 +119,53 @@ export const Projects = () => {
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-surface/30 border border-surfaceHighlight/30">
-                      <p className="text-sm text-slate-300 leading-relaxed">{currentInfo.desc}</p>
+                    <div className="p-5 rounded-xl bg-surface/30 border border-surfaceHighlight/50 backdrop-blur-sm shadow-inner">
+                      <p className="text-sm text-slate-300 leading-relaxed font-light">{currentInfo.desc}</p>
                     </div>
 
-                    <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[#05080f] rounded-xl border border-surfaceHighlight/30 relative overflow-hidden min-h-[200px]">
-                      <h5 className="absolute top-4 left-4 text-[10px] font-mono text-secondary uppercase tracking-wider">Conceptual Flow</h5>
+                    {/* Architecture Conceptual Diagram */}
+                    <div className="flex-1 flex flex-col items-center justify-center p-8 bg-[#05080f]/80 rounded-xl border border-surfaceHighlight/50 relative overflow-hidden min-h-[220px] shadow-lg">
+                      <h5 className="absolute top-4 left-4 text-[10px] font-mono text-secondary uppercase tracking-wider bg-secondary/10 px-2 py-1 rounded">Conceptual Data Flow</h5>
                       
-                      <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 mt-8 md:mt-4 w-full px-4">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-[40px] pointer-events-none" />
+                      
+                      <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 w-full mt-4 z-10">
                         {currentInfo.blocks.map((block, idx) => (
-                          <div key={idx} className="flex flex-col md:flex-row items-center gap-2 md:gap-4 shrink-0">
-                            <div className="bg-[#0a0f18] border border-surfaceHighlight px-4 py-3 rounded-lg text-center shadow-lg w-40 md:w-32 lg:w-40">
-                              <span className="text-xs text-slate-300 font-medium block">{block}</span>
+                          <div key={idx} className="flex flex-col md:flex-row items-center gap-2 md:gap-4 shrink-0 group">
+                            <div className="bg-[#0a0f18] border border-surfaceHighlight/80 px-4 py-3 rounded-lg text-center shadow-xl w-40 md:w-32 lg:w-40 group-hover:border-primary/50 group-hover:-translate-y-1 transition-all duration-300">
+                              <span className="text-xs text-slate-200 font-semibold block tracking-wide">{block}</span>
                             </div>
                             {idx < currentInfo.blocks.length - 1 && (
-                              <div className="text-surfaceHighlight flex flex-col items-center">
-                                <ArrowRight className="w-4 h-4 hidden md:block" />
-                                <div className="w-[1px] h-4 bg-surfaceHighlight block md:hidden my-1"></div>
+                              <div className="text-primary/50 flex flex-col items-center">
+                                <ArrowRight className="w-5 h-5 hidden md:block" />
+                                <div className="w-[1px] h-4 bg-primary/30 block md:hidden my-1"></div>
                               </div>
                             )}
                           </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Interactive Sparse Matrix Demo */}
+                    <div className="p-5 rounded-xl bg-surface/20 border border-surfaceHighlight/30 flex flex-col gap-4">
+                      <h5 className="text-[11px] font-mono text-primary uppercase tracking-wider">User-Item Interaction Matrix (Sparse Demo)</h5>
+                      <div className="grid grid-cols-6 gap-2 w-full max-w-sm mx-auto p-4 bg-[#0a0f18] rounded-lg border border-white/5">
+                        <div className="text-[9px] text-center font-mono text-textMuted border-b border-white/10 pb-1">U \ I</div>
+                        {[1,2,3,4,5].map(i => <div key={`i${i}`} className="text-[9px] text-center font-mono text-textMuted border-b border-white/10 pb-1">i{i}</div>)}
+                        {[1,2,3,4].map(u => (
+                          <React.Fragment key={`u${u}`}>
+                            <div className="text-[9px] text-center font-mono text-textMuted border-r border-white/10 pr-1 flex items-center justify-center">u{u}</div>
+                            {[1,2,3,4,5].map(i => {
+                              const isActive = (u*i) % 3 === 0;
+                              return (
+                                <div 
+                                  key={`cell-${u}-${i}`} 
+                                  className={`w-full aspect-square rounded-[2px] transition-all duration-500 hover:scale-110 cursor-pointer ${isActive ? 'bg-primary/80 shadow-[0_0_8px_rgba(75,213,232,0.6)]' : 'bg-surfaceHighlight/30 hover:bg-surfaceHighlight'}`}
+                                  title={isActive ? `User ${u} interacted with Item ${i}` : 'No interaction'}
+                                />
+                              )
+                            })}
+                          </React.Fragment>
                         ))}
                       </div>
                     </div>
