@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -13,7 +13,6 @@ EXPOSE 8000
 
 # Set environment variables for production
 ENV ALLOWED_ORIGINS="https://vuanalytics.me"
-ENV PORT=8000
 
-# Use the PORT environment variable provided by Render/Heroku
-CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
+# Use the PORT environment variable provided by Render, fallback to 8000
+CMD sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"

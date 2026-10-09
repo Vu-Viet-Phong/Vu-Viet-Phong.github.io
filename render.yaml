@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: vuanalytics-backend
+    env: docker
+    rootDir: backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: "https://vuanalytics.me,http://localhost:5173"
+      - key: ENV
+        value: "production"
