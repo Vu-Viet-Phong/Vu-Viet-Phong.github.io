@@ -52,9 +52,9 @@ export const AILab = () => {
       try {
         // Just checking model status route
         const res = await apiClient.get('/models');
-        if (res && res.status) {
+        if (res && res.models) {
           setApiStatus('online');
-          setApiMode(res.status.includes('Simulation') ? 'DEMO MODE (Backend)' : 'LIVE INFERENCE');
+          setApiMode(res.live ? 'LIVE INFERENCE' : 'DEMO MODE (Backend)');
         } else {
           setApiStatus('offline');
         }
