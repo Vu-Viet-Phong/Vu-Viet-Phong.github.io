@@ -39,7 +39,7 @@ jobs:
       - name: Run Backend Tests
         run: |
           cd backend
-          pytest
+          python -m pytest
       - name: Build
         run: npm run build
         env:

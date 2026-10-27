@@ -1,124 +1,84 @@
-import { Network, Database, BrainCircuit, Search, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { Network, Database, BrainCircuit, Search } from 'lucide-react';
 
 const areas = [
   {
     title: 'Recommendation Systems',
-    icon: <Database className="w-6 h-6 text-primary" />,
-    description: 'Exploring matrix factorization, neural collaborative filtering, and state-of-the-art algorithms for personalized discovery.',
+    icon: <Database className="w-5 h-5 text-primary" />,
+    description: 'Investigating high-order graph collaborative filtering, matrix factorization, and multimodal representation learning for personalized discovery.',
     link: '#projects',
-    viz: (
-      <div className="flex items-center justify-center h-24 mt-4 opacity-70 group-hover:opacity-100 transition-opacity">
-        <svg viewBox="0 0 100 60" className="w-full h-full max-w-[150px]">
-          <circle cx="20" cy="30" r="8" fill="#4BD5E8" className="animate-pulse" />
-          <circle cx="80" cy="15" r="6" fill="#9788EF" />
-          <circle cx="80" cy="45" r="6" fill="#9788EF" />
-          <path d="M 28 30 Q 50 15 74 15" fill="none" stroke="#4BD5E8" strokeWidth="2" strokeDasharray="4 4" className="opacity-50" />
-          <path d="M 28 30 Q 50 45 74 45" fill="none" stroke="#4BD5E8" strokeWidth="2" strokeDasharray="4 4" className="opacity-50" />
-        </svg>
-      </div>
-    )
+    tags: ['LightGCN', 'NGCF', 'BPR Loss']
   },
   {
-    title: 'Graph Intelligence',
-    icon: <Network className="w-6 h-6 text-secondary" />,
-    description: 'Leveraging graph neural networks to understand complex structural relationships in data ecosystems.',
+    title: 'Graph Intelligence & GNNs',
+    icon: <Network className="w-5 h-5 text-secondary" />,
+    description: 'Exploiting relational topology and topological embeddings to capture complex structural dependencies across bipartite and heterogeneous networks.',
     link: '#projects',
-    viz: (
-      <div className="flex items-center justify-center h-24 mt-4 opacity-70 group-hover:opacity-100 transition-opacity">
-        <svg viewBox="0 0 100 60" className="w-full h-full max-w-[150px]">
-          <circle cx="50" cy="30" r="10" fill="#9788EF" />
-          <circle cx="20" cy="15" r="5" fill="#30415d" />
-          <circle cx="80" cy="15" r="5" fill="#30415d" />
-          <circle cx="20" cy="45" r="5" fill="#30415d" />
-          <circle cx="80" cy="45" r="5" fill="#30415d" />
-          <line x1="25" y1="18" x2="42" y2="25" stroke="#9788EF" strokeWidth="1.5" />
-          <line x1="75" y1="18" x2="58" y2="25" stroke="#9788EF" strokeWidth="1.5" />
-          <line x1="25" y1="42" x2="42" y2="35" stroke="#9788EF" strokeWidth="1.5" />
-          <line x1="75" y1="42" x2="58" y2="35" stroke="#9788EF" strokeWidth="1.5" />
-        </svg>
-      </div>
-    )
+    tags: ['Graph Convolutions', 'Heterogeneous Graphs', 'Message Passing']
   },
   {
-    title: 'Multimodal Learning',
-    icon: <BrainCircuit className="w-6 h-6 text-green-400" />,
-    description: 'Fusing visual, textual, and structural representations to build robust, context-aware machine learning models.',
+    title: 'Multimodal Representation',
+    icon: <BrainCircuit className="w-5 h-5 text-emerald-400" />,
+    description: 'Fusing visual semantic features from deep CNNs with structural user-item interaction signals into a unified latent metric space.',
     link: '#projects',
-    viz: (
-      <div className="flex items-center justify-center h-24 mt-4 opacity-70 group-hover:opacity-100 transition-opacity">
-        <svg viewBox="0 0 100 60" className="w-full h-full max-w-[150px]">
-          <rect x="15" y="10" width="15" height="15" rx="3" fill="#4BD5E8" opacity="0.6" />
-          <path d="M 15 40 L 30 40 L 30 42 L 15 42 Z M 15 45 L 25 45 L 25 47 L 15 47 Z" fill="#9788EF" />
-          <path d="M 35 17 Q 50 30 65 30" fill="none" stroke="#4BD5E8" strokeWidth="1.5" />
-          <path d="M 35 43 Q 50 30 65 30" fill="none" stroke="#9788EF" strokeWidth="1.5" />
-          <rect x="65" y="20" width="20" height="20" rx="4" fill="#30415d" stroke="#fff" strokeWidth="1" />
-        </svg>
-      </div>
-    )
+    tags: ['VBPR', 'Feature Alignment', 'Latent Spaces']
   },
   {
-    title: 'Information Retrieval & RAG',
-    icon: <Search className="w-6 h-6 text-pink-400" />,
-    description: 'Designing GraphRAG architectures and hybrid vector-graph retrieval pipelines for grounded, citation-supported retrieval.',
-    link: '#projects',
-    viz: (
-      <div className="flex items-center justify-center h-24 mt-4 opacity-70 group-hover:opacity-100 transition-opacity">
-        <svg viewBox="0 0 100 60" className="w-full h-full max-w-[150px]">
-          <path d="M 10 30 L 25 30 L 30 20 L 40 40 L 45 30 L 60 30" fill="none" stroke="#pink-400" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="stroke-pink-400" />
-          <rect x="65" y="22" width="25" height="16" rx="2" fill="none" stroke="#4BD5E8" strokeWidth="1.5" strokeDasharray="2 2" />
-          <text x="77.5" y="34" fontSize="8" fill="#4BD5E8" textAnchor="middle">Ctx</text>
-        </svg>
-      </div>
-    )
+    title: 'Information Retrieval & GraphRAG',
+    icon: <Search className="w-5 h-5 text-amber-400" />,
+    description: 'Architecting zero-hallucination retrieval pipelines uniting dense vector similarity search with Neo4j multi-hop graph traversal.',
+    link: '#lab',
+    tags: ['Hybrid Search', 'Reciprocal Rank Fusion', 'Knowledge Graphs']
   }
 ];
 
 export const Research = () => {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-
   return (
-    <section id="research" className="py-24 bg-background relative border-t border-surfaceHighlight/30">
+    <section id="research" className="py-24 bg-[#090F1C] relative border-t border-surfaceHighlight/40">
       <div className="container mx-auto px-6">
         
-        <div className="mb-16 max-w-2xl">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Research Areas</h2>
-          <p className="text-textMuted text-lg leading-relaxed">
-            Theoretical foundations and practical explorations across modern artificial intelligence domains.
+        <div className="mb-16 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono uppercase tracking-wider mb-4">
+            <BrainCircuit className="w-3.5 h-3.5" />
+            <span>Research & Foundations</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-4 text-white">
+            Core Research Domains
+          </h2>
+          <p className="text-textMuted text-base sm:text-lg leading-relaxed font-light">
+            Theoretical machine learning principles underpinning intelligent systems, graph architectures, and information retrieval.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {areas.map((area, index) => (
-            <div
+            <a
               key={index}
-              onMouseEnter={() => setHoveredIdx(index)}
-              onMouseLeave={() => setHoveredIdx(null)}
-              className="glass-panel p-6 rounded-2xl group hover:border-primary/40 hover:bg-surfaceHighlight/10 transition-all block relative overflow-hidden"
+              href={area.link}
+              className="glass-panel p-6 rounded-2xl group hover:border-primary/50 transition-all flex flex-col justify-between"
             >
-              <div className="relative z-10">
-                <div className="w-12 h-12 rounded-xl bg-surface border border-surfaceHighlight flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <div>
+                <div className="w-10 h-10 rounded-xl bg-surface border border-surfaceHighlight flex items-center justify-center mb-5 group-hover:scale-105 transition-transform shadow-lg">
                   {area.icon}
                 </div>
-                <h3 className="text-lg font-semibold mb-3 text-white group-hover:text-primary transition-colors">{area.title}</h3>
-                <p className="text-sm text-textMuted leading-relaxed min-h-[80px]">{area.description}</p>
-              </div>
-              
-              <div className="border-t border-surfaceHighlight/50 pt-4 mt-2">
-                {area.viz}
-              </div>
-
-              <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center text-[10px] uppercase font-mono text-primary gap-1">
-                Explore <ChevronRight className="w-3 h-3" />
+                <h3 className="text-lg font-display font-semibold text-white mb-2 group-hover:text-primary transition-colors">
+                  {area.title}
+                </h3>
+                <p className="text-xs text-textMuted leading-relaxed font-light mb-4">
+                  {area.description}
+                </p>
               </div>
 
-              {/* Hover gradient backdrop */}
-              <div 
-                className={`absolute inset-0 bg-gradient-to-b from-transparent to-primary/5 pointer-events-none transition-opacity duration-500 ${hoveredIdx === index ? 'opacity-100' : 'opacity-0'}`} 
-              />
-            </div>
+              <div className="flex flex-wrap gap-1.5 pt-4 border-t border-surfaceHighlight/50">
+                {area.tags.map((t) => (
+                  <span key={t} className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface border border-surfaceHighlight text-slate-300">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </a>
           ))}
         </div>
+
       </div>
     </section>
   );
