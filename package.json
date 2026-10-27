@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "node tests/e2e/verify_experience.js",
-    "test:browser": "node tests/e2e/browser_e2e.test.mjs"
+    "test:browser": "node tests/e2e/browser_e2e.mjs"
   },
   "dependencies": {
     "cytoscape": "^3.28.1",
