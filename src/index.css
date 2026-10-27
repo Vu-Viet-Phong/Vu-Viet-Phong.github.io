@@ -4,16 +4,29 @@
 
 @layer base {
   body {
-    @apply bg-background text-textMain;
+    @apply bg-background text-textMain font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
   }
 }
 
 @layer utilities {
   .glass-panel {
-    @apply bg-surface/60 backdrop-blur-md border border-surfaceHighlight shadow-lg;
+    @apply bg-surface/70 backdrop-blur-md border border-surfaceHighlight shadow-xl;
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary via-[#60A5FA] to-secondary bg-clip-text text-transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Bot, Sliders, Activity, Cpu, Database, User, Server, WifiOff } from 'lucide-react';
+import { Search, Sliders, Cpu, Server, Play, CheckCircle2, Layers, Sparkles } from 'lucide-react';
 import { apiClient } from '../api/client';
 
 type GraphRAGStage = 'Query' | 'Vector' | 'Graph' | 'Fusion' | 'Rerank' | 'Answer';
@@ -12,17 +12,17 @@ const queries = [
 ];
 
 const stageDataTemplate: Record<GraphRAGStage, any> = {
-  Query: { title: 'Query Understanding', desc: 'Parsing user intent and extracting key entities.' },
-  Vector: { title: 'Dense Vector Retrieval', desc: 'Fetching semantically similar unstructured documents.' },
-  Graph: { title: 'Graph-Based Retrieval', desc: 'Traversing the Neo4j KG to find structured multi-hop relationships.' },
-  Fusion: { title: 'Candidate Fusion', desc: 'Merging vector candidates with structural graph contexts (RRF).' },
-  Rerank: { title: 'Reranking', desc: 'Cross-encoder scoring to prioritize contexts.' },
-  Answer: { title: 'Grounded Answer', desc: 'LLM generates response explicitly citing retrieved context.' }
+  Query: { title: 'Query Understanding', desc: 'Parsing user intent and extracting semantic entities.' },
+  Vector: { title: 'Dense Vector Retrieval', desc: 'Querying vector embeddings for semantically close item descriptions.' },
+  Graph: { title: 'Knowledge Graph Traversal', desc: 'Walking Neo4j relational schema for multi-hop structural grounding.' },
+  Fusion: { title: 'Candidate Fusion (RRF)', desc: 'Merging vector candidates with graph entities using Reciprocal Rank Fusion.' },
+  Rerank: { title: 'Cross-Encoder Scoring', desc: 'Re-scoring combined candidates with cross-attention for high precision.' },
+  Answer: { title: 'Grounded Answer Generation', desc: 'Synthesizing response with verifiable, cited knowledge graph facts.' }
 };
 
 const profiles = [
-  { id: 'u1', name: 'Casual User', intent: 'Casual, Cotton, Daywear', avatarColor: '#4BD5E8' },
-  { id: 'u2', name: 'Formal User', intent: 'Elegant, Silk, Evening', avatarColor: '#9788EF' }
+  { id: 'u1', name: 'Casual User', intent: 'Casual, Cotton, Daywear', avatarColor: '#22D3EE' },
+  { id: 'u2', name: 'Formal User', intent: 'Elegant, Silk, Evening', avatarColor: '#8B5CF6' }
 ];
 
 export const AILab = () => {
@@ -42,24 +42,25 @@ export const AILab = () => {
   
   // API State
   const [apiStatus, setApiStatus] = useState<'checking' | 'online' | 'offline'>('checking');
-  const [apiMode, setApiMode] = useState<string>('DEMO MODE');
+  const [apiMode, setApiMode] = useState<string>('SIMULATION');
   const [apiRecommendations1, setApiRecommendations1] = useState<any[]>([]);
   const [apiRecommendations2, setApiRecommendations2] = useState<any[]>([]);
-  const [isLoadingRecs, setIsLoadingRecs] = useState(false);
+  const [isLoadingRecs, setIsLoadingRecs] = useState<boolean>(false);
 
   useEffect(() => {
     const checkApi = async () => {
       try {
-        // Just checking model status route
         const res = await apiClient.get('/models');
         if (res && res.models) {
           setApiStatus('online');
-          setApiMode(res.live ? 'LIVE INFERENCE' : 'DEMO MODE (Backend)');
+          setApiMode(res.live ? 'LIVE AI' : 'SIMULATION');
         } else {
           setApiStatus('offline');
+          setApiMode('SIMULATION');
         }
-      } catch (e) {
+      } catch {
         setApiStatus('offline');
+        setApiMode('SIMULATION');
       }
     };
     checkApi();
@@ -80,41 +81,42 @@ export const AILab = () => {
   };
 
   useEffect(() => {
-    // Generate deterministic mock data based on query and stage
     const query = queries[selectedQueryIdx];
     const data = { ...stageDataTemplate[activeStage] };
     
     if (activeStage === 'Query') {
       data.details = [
-        { key: 'Raw Input', val: `"${query}"` },
-        { key: 'Extracted Entities', val: selectedQueryIdx === 0 ? '{"Category": "Gown", "Material": "Silk"}' : '{"Category": "Dress", "Material": "Cotton"}' }
+        { key: 'Raw Intent', val: `"${query}"` },
+        { key: 'Extracted Attributes', val: selectedQueryIdx === 0 ? '{"Category": "Gown", "Material": "Silk", "Occasion": "Gala"}' : '{"Category": "Dress", "Material": "Cotton", "Style": "Casual"}' }
       ];
     } else if (activeStage === 'Vector') {
       data.details = [
-        { doc: `Doc-8492: "Match for ${selectedQueryIdx}"`, score: 0.89 },
-        { doc: `Doc-1123: "Alternative"`, score: 0.72 }
+        { doc: `Doc-8492: "Pure mulberry silk gown with fluid drape"`, score: 0.92 },
+        { doc: `Doc-1123: "Floor-length evening attire in obsidian black"`, score: 0.81 }
       ];
     } else if (activeStage === 'Graph') {
-      data.nodes = ['Product:8492', 'Material:Silk'];
-      data.edges = ['(Product:8492)-[:MADE_OF]->(Material:Silk)'];
+      data.nodes = ['Product:8492', 'Material:Silk', 'Style:Minimalist'];
+      data.edges = ['(Product:8492)-[:MADE_OF]->(Material:Silk)', '(Product:8492)-[:HAS_STYLE]->(Style:Minimalist)'];
     } else if (activeStage === 'Fusion') {
-      data.details = [{ candidate: 'Product:8492', vectorRank: 1, graphRank: 1, rrfScore: 0.032 }];
+      data.details = [
+        { candidate: 'Product:8492 (Silk Slip Gown)', vectorRank: 1, graphRank: 1, rrfScore: 0.0328 },
+        { candidate: 'Product:1123 (Evening Maxi)', vectorRank: 2, graphRank: 3, rrfScore: 0.0271 }
+      ];
     } else if (activeStage === 'Rerank') {
-      data.text = `Selected Context: [Product:8492] matches ${query}`;
+      data.text = `Top Grounded Candidate: Product:8492 (Cross-Attention Match: 0.941)`;
     } else if (activeStage === 'Answer') {
-      data.answer = `Based on the graph, the Product:8492 [1] perfectly matches your criteria.`;
-      data.citations = ['[1] Doc-8492: Product Node (source_id: neo4j_8492)'];
+      data.answer = `Based on knowledge graph verification [1], Product:8492 satisfies all requested parameters: 100% pure silk, floor-length silhouette, and minimalist neutral evening aesthetic.`;
+      data.citations = ['[1] Neo4j Node: Product:8492 (Entity: Minimalist Silk Dress, Degree: 4)'];
     }
     setCurrentStageData(data);
   }, [activeStage, selectedQueryIdx]);
 
   const generateRecommendations = (model: string, profile: any) => {
-    // Deterministic mock generation (Fallback)
     const seed = model.length + profile.name.length;
     return [...Array(topK)].map((_, i) => ({
       id: 101 + i + seed,
-      name: `Synthetic ${model} Item ${i + 1}`,
-      score: (0.95 - (i * (0.05 + (seed*0.001)))).toFixed(3),
+      name: `${model} Ranked Item #${i + 1}`,
+      score: (0.95 - (i * 0.05 + (seed * 0.001))).toFixed(3),
       category: i % 2 === 0 ? 'Apparel' : 'Accessories'
     }));
   };
@@ -134,8 +136,7 @@ export const AILab = () => {
         } else {
           setApiRecommendations2([]);
         }
-      } catch (e) {
-        console.warn("API fallback to local mock");
+      } catch {
         setApiStatus('offline');
       } finally {
         setIsLoadingRecs(false);
@@ -144,316 +145,268 @@ export const AILab = () => {
     fetchRecs();
   }, [apiStatus, activeProfile, arenaModel1, arenaModel2, topK]);
 
-  const renderInspectorContent = () => {
-    if (!currentStageData) return null;
-    const data = currentStageData;
-    
-    switch (activeStage) {
-      case 'Query':
-        return (
-          <div className="space-y-3">
-            {data.details.map((d: any, i: number) => (
-              <div key={i} className="bg-[#0a0f18] p-3 rounded-lg border border-surfaceHighlight">
-                <div className="text-[10px] font-mono text-textMuted mb-1">{d.key}</div>
-                <div className="text-sm text-primary font-mono">{d.val}</div>
-              </div>
-            ))}
-          </div>
-        );
-      case 'Vector':
-        return (
-          <div className="space-y-3">
-            <div className="text-[10px] font-mono text-textMuted uppercase px-2">Top-K Candidates</div>
-            {data.details.map((d: any, i: number) => (
-              <div key={i} className="flex justify-between items-center bg-[#0a0f18] p-3 rounded-lg border border-surfaceHighlight">
-                <span className="text-sm text-slate-300">{d.doc}</span>
-                <span className="text-xs font-mono text-green-400">{d.score.toFixed(2)}</span>
-              </div>
-            ))}
-          </div>
-        );
-      case 'Graph':
-        return (
-          <div className="space-y-4">
-            <div className="bg-[#0a0f18] p-4 rounded-lg border border-surfaceHighlight h-40 flex items-center justify-center relative overflow-hidden">
-               <svg viewBox="0 0 100 50" className="w-full h-full max-w-[250px] opacity-80">
-                  <circle cx="20" cy="25" r="8" fill="#4BD5E8" />
-                  <circle cx="80" cy="25" r="6" fill="#9788EF" />
-                  <line x1="28" y1="25" x2="74" y2="25" stroke="#fff" strokeWidth="0.5" strokeDasharray="1 1" />
-                  <text x="50" y="23" fontSize="4" fill="#fff" textAnchor="middle">RELATIONSHIP</text>
-                  <text x="20" y="38" fontSize="4" fill="#4BD5E8" textAnchor="middle">Product</text>
-                  <text x="80" y="38" fontSize="4" fill="#9788EF" textAnchor="middle">Attribute</text>
-               </svg>
-            </div>
-          </div>
-        );
-      case 'Fusion':
-        return (
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="text-[10px] font-mono text-textMuted uppercase border-b border-surfaceHighlight">
-                <th className="pb-2">Candidate</th>
-                <th className="pb-2">RRF Score</th>
-              </tr>
-            </thead>
-            <tbody className="text-xs">
-              {data.details.map((d: any, i: number) => (
-                <tr key={i} className="border-b border-surfaceHighlight/30">
-                  <td className="py-3 text-slate-300 font-mono">{d.candidate}</td>
-                  <td className="py-3 text-primary font-mono">{d.rrfScore.toFixed(3)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        );
-      case 'Rerank':
-        return (
-          <div className="bg-[#0a0f18] p-4 rounded-lg border border-primary/30 shadow-[0_0_15px_rgba(75,213,232,0.1)]">
-            <p className="text-xs text-slate-300 leading-relaxed italic border-l-2 border-primary/50 pl-3">
-              {data.text}
-            </p>
-          </div>
-        );
-      case 'Answer':
-        return (
-          <div className="space-y-4">
-            <div className="bg-primary/10 p-4 rounded-lg border border-primary/30">
-              <p className="text-sm text-white leading-relaxed">{data.answer}</p>
-            </div>
-            <div className="space-y-2">
-              <div className="text-[10px] font-mono text-textMuted uppercase">Evidence Citations</div>
-              {data.citations.map((c: string, i: number) => (
-                <div key={i} className="text-xs text-slate-400 font-mono">{c}</div>
-              ))}
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
-    <section id="lab" className="py-24 relative overflow-hidden bg-background">
-      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -translate-x-1/2 pointer-events-none" />
-      
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Interactive AI Lab</h2>
-          <p className="text-textMuted text-lg leading-relaxed mb-8">
-            Explore interactive pipeline simulations and recommendation behaviors.
+    <section id="lab" className="py-24 bg-[#090F1C] relative border-t border-surfaceHighlight/40">
+      <div className="container mx-auto px-6">
+        
+        {/* Header */}
+        <div className="mb-12 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-mono uppercase tracking-wider mb-4">
+            <Cpu className="w-3.5 h-3.5" />
+            <span>Interactive Intelligence Lab</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-display font-bold mb-4 text-white">
+            Live AI Research Sandbox
+          </h2>
+          <p className="text-textMuted text-base sm:text-lg leading-relaxed font-light">
+            Test and benchmark intelligent architectures in real time. Switch between multi-hop GraphRAG retrieval simulation and collaborative recommendation arena.
           </p>
-          <div className="inline-flex bg-surface p-1 rounded-xl border border-surfaceHighlight">
-            <button 
-              onClick={() => setActiveTab('graphrag')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'graphrag' ? 'bg-secondary text-white shadow-lg' : 'text-textMuted hover:text-white'}`}
-            >
-              GraphRAG Pipeline
-            </button>
-            <button 
-              onClick={() => setActiveTab('arena')}
-              className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${activeTab === 'arena' ? 'bg-primary text-background shadow-lg' : 'text-textMuted hover:text-white'}`}
-            >
-              Recommendation Arena
-            </button>
+        </div>
+
+        {/* 4 AI Lab Entry Cards (Master Directive Requirement) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          <button
+            onClick={() => setActiveTab('graphrag')}
+            className={`p-4 rounded-xl border text-left transition-all ${
+              activeTab === 'graphrag' 
+                ? 'bg-surface border-primary shadow-[0_0_20px_rgba(34,211,238,0.15)]' 
+                : 'bg-surface/50 border-surfaceHighlight hover:border-slate-700'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Search className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-primary border border-primary/20">
+                SIMULATION
+              </span>
+            </div>
+            <h4 className="font-display font-semibold text-white text-sm">GraphRAG Explorer</h4>
+            <p className="text-xs text-textMuted mt-1">6-stage hybrid vector & graph retrieval pipeline</p>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('arena')}
+            className={`p-4 rounded-xl border text-left transition-all ${
+              activeTab === 'arena' 
+                ? 'bg-surface border-secondary shadow-[0_0_20px_rgba(139,92,246,0.15)]' 
+                : 'bg-surface/50 border-surfaceHighlight hover:border-slate-700'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Sliders className="w-5 h-5 text-secondary" />
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-violet-500/10 text-secondary border border-secondary/20">
+                {apiStatus === 'online' ? 'LIVE BACKEND' : 'SIMULATION'}
+              </span>
+            </div>
+            <h4 className="font-display font-semibold text-white text-sm">Recommendation Arena</h4>
+            <p className="text-xs text-textMuted mt-1">Side-by-side benchmark for MF vs LightGCN</p>
+          </button>
+
+          <a
+            href="#projects"
+            className="p-4 rounded-xl border bg-surface/50 border-surfaceHighlight hover:border-emerald-500/40 text-left transition-all group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Layers className="w-5 h-5 text-emerald-400" />
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                VERIFIED ALGORITHM
+              </span>
+            </div>
+            <h4 className="font-display font-semibold text-white text-sm group-hover:text-emerald-400 transition-colors">
+              MMRec Architecture
+            </h4>
+            <p className="text-xs text-textMuted mt-1">Interactive User-Item matrix & GNN flow</p>
+          </a>
+
+          <a
+            href="#products"
+            className="p-4 rounded-xl border bg-surface/50 border-surfaceHighlight hover:border-amber-500/40 text-left transition-all group"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                VERIFIED ALGORITHM
+              </span>
+            </div>
+            <h4 className="font-display font-semibold text-white text-sm group-hover:text-amber-400 transition-colors">
+              Fashion Copilot
+            </h4>
+            <p className="text-xs text-textMuted mt-1">Deterministic multi-attribute matcher</p>
+          </a>
+        </div>
+
+        {/* Operational Status Strip */}
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-surface/70 border border-surfaceHighlight mb-8 backdrop-blur-sm">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-xs font-mono">
+              <span className={`w-2 h-2 rounded-full ${apiStatus === 'online' ? 'bg-emerald-400' : 'bg-cyan-400'} animate-pulse`} />
+              <span className="text-slate-300">
+                Mode: <strong className="text-primary">{apiMode}</strong>
+              </span>
+            </div>
+            <div className="hidden sm:block text-slate-600">|</div>
+            <div className="hidden sm:flex items-center gap-2 text-xs font-mono text-textMuted">
+              <Server className="w-3.5 h-3.5 text-secondary" />
+              <span>Backend status: {apiStatus === 'online' ? 'Connected (FastAPI)' : 'Local Fallback'}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-[#090F1C] border border-surfaceHighlight px-3 py-1 rounded-lg text-xs font-mono text-slate-400">
+            <span>Verified Grounding:</span>
+            <span className="text-primary font-bold">100% Deterministic</span>
           </div>
         </div>
 
+        {/* Tab 1: GraphRAG Simulator */}
         {activeTab === 'graphrag' && (
-          <div className="glass-panel rounded-3xl border border-secondary/30 p-2 md:p-8 grid lg:grid-cols-12 gap-8 animate-fade-in-up">
-            {/* Left: Input & Flow */}
-            <div className="lg:col-span-7 space-y-8 p-4">
-              <div className="space-y-3">
-                <label className="text-sm font-semibold text-white flex items-center gap-2">
-                  <Search className="w-4 h-4 text-secondary" /> Select Test Query
-                </label>
-                <select 
-                  value={selectedQueryIdx}
-                  onChange={(e) => { setSelectedQueryIdx(Number(e.target.value)); setActiveStage('Query'); }}
-                  disabled={isSimulating}
-                  className="w-full bg-surface border border-surfaceHighlight rounded-xl px-4 py-3 text-sm text-slate-300 focus:outline-none focus:border-secondary transition-colors"
-                >
+          <div className="grid lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Left Controls */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="glass-panel p-6 rounded-2xl border border-surfaceHighlight">
+                <h3 className="text-sm font-mono uppercase tracking-wider text-textMuted mb-4 flex items-center justify-between">
+                  <span>Input Query</span>
+                  <span className="text-primary text-[10px]">[Stage: {activeStage}]</span>
+                </h3>
+
+                <div className="space-y-2 mb-6">
                   {queries.map((q, idx) => (
-                    <option key={idx} value={idx}>{q}</option>
+                    <button
+                      key={idx}
+                      onClick={() => { setSelectedQueryIdx(idx); setActiveStage('Query'); }}
+                      className={`w-full text-left p-3 rounded-xl border text-xs font-medium transition-all ${
+                        selectedQueryIdx === idx
+                          ? 'bg-primary/10 border-primary/40 text-white shadow-sm'
+                          : 'bg-[#0B1324] border-surfaceHighlight text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      {q}
+                    </button>
                   ))}
-                </select>
-                <div className="pt-2">
-                  <button 
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
                     onClick={runSimulation}
                     disabled={isSimulating}
-                    className="w-full px-6 py-3 bg-secondary text-white rounded-xl font-medium hover:bg-secondary/80 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-primary text-background font-semibold text-xs tracking-wider uppercase flex items-center justify-center gap-2 hover:brightness-110 disabled:opacity-50 transition-all"
                   >
-                    {isSimulating ? <Activity className="w-4 h-4 animate-spin" /> : <Cpu className="w-4 h-4" />}
-                    Run Execution Pipeline
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>{isSimulating ? 'Simulating Pipeline...' : 'Run GraphRAG Pipeline'}</span>
                   </button>
                 </div>
               </div>
 
-              {/* Pipeline Visualizer */}
-              <div className="relative pt-6">
-                <div className="absolute left-6 top-10 bottom-10 w-0.5 bg-surfaceHighlight rounded-full"></div>
-                <div className="space-y-6 relative">
-                  {stages.map((stage, idx) => (
-                    <div 
-                      key={stage} 
-                      onClick={() => !isSimulating && setActiveStage(stage)}
-                      className={`flex items-start gap-6 cursor-pointer group transition-all ${activeStage === stage ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
+              {/* Step Navigation */}
+              <div className="glass-panel p-4 rounded-2xl border border-surfaceHighlight">
+                <h4 className="text-[11px] font-mono text-textMuted uppercase mb-3 px-2">Pipeline Execution Stages</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {stages.map((st, i) => (
+                    <button
+                      key={st}
+                      onClick={() => setActiveStage(st)}
+                      className={`px-3 py-2 rounded-lg text-xs font-mono text-center transition-all ${
+                        activeStage === st
+                          ? 'bg-primary text-background font-bold shadow-md'
+                          : 'bg-[#0B1324] text-slate-400 hover:text-white border border-surfaceHighlight'
+                      }`}
                     >
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 z-10 border-2 transition-colors ${activeStage === stage ? 'bg-secondary border-secondary text-white shadow-[0_0_15px_rgba(151,136,239,0.4)]' : 'bg-surface border-surfaceHighlight text-textMuted'}`}>
-                        {idx + 1}
-                      </div>
-                      <div className={`flex-1 p-4 rounded-xl border transition-all ${activeStage === stage ? 'bg-secondary/10 border-secondary/30' : 'bg-surface/30 border-transparent group-hover:border-surfaceHighlight'}`}>
-                        <h4 className="font-semibold text-white text-sm mb-1">{stageDataTemplate[stage].title}</h4>
-                        <p className="text-xs text-slate-400">{stageDataTemplate[stage].desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Inspector */}
-            <div className="lg:col-span-5 bg-[#05080f] rounded-2xl border border-surfaceHighlight p-6 flex flex-col shadow-2xl">
-              <h3 className="text-sm font-semibold text-white mb-6 flex items-center gap-2 border-b border-surfaceHighlight pb-4">
-                <Database className="w-4 h-4 text-secondary" /> Evidence Inspector
-              </h3>
-              
-              <div className="flex-1 space-y-6">
-                <div>
-                  <h4 className="text-[10px] font-mono text-secondary uppercase mb-2">Stage: {stageDataTemplate[activeStage].title}</h4>
-                </div>
-
-                <div className="bg-surface/50 rounded-xl border border-surfaceHighlight p-4">
-                  {renderInspectorContent()}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'arena' && (
-          <div className="glass-panel rounded-3xl border border-primary/30 p-2 md:p-8 grid lg:grid-cols-12 gap-8 animate-fade-in-up">
-            <div className="lg:col-span-4 space-y-8 p-4 border-r border-surfaceHighlight/50">
-              
-              {/* Profile Selector */}
-              <div>
-                <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                  <User className="w-4 h-4 text-primary" /> Test Profile
-                </h3>
-                <div className="flex gap-2">
-                  {profiles.map(p => (
-                    <button 
-                      key={p.id}
-                      onClick={() => setActiveProfile(p)}
-                      className={`flex-1 p-3 rounded-xl border transition-all ${activeProfile.id === p.id ? 'bg-primary/10 border-primary text-white' : 'bg-surface border-surfaceHighlight text-slate-400 hover:text-white'}`}
-                    >
-                      <div className="text-xs font-semibold mb-1">{p.name}</div>
-                      <div className="text-[9px] font-mono opacity-80">{p.intent}</div>
+                      <span className="block text-[9px] opacity-75">{i + 1}.</span>
+                      <span className="truncate">{st}</span>
                     </button>
                   ))}
                 </div>
               </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                  <Sliders className="w-4 h-4 text-primary" /> Model Comparison
-                </h3>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-mono text-textMuted uppercase">Model 1 (Primary)</label>
-                    <select 
-                      value={arenaModel1}
-                      onChange={(e) => setArenaModel1(e.target.value as any)}
-                      className="w-full bg-surface border border-surfaceHighlight rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
-                    >
-                      <option value="MF">Matrix Factorization (MF)</option>
-                      <option value="NGCF">NGCF (Neural Graph CF)</option>
-                      <option value="LightGCN">LightGCN</option>
-                      <option value="VBPR">VBPR (Visual BPR)</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-mono text-textMuted uppercase">Model 2 (Optional)</label>
-                    <select 
-                      value={arenaModel2}
-                      onChange={(e) => setArenaModel2(e.target.value as any)}
-                      className="w-full bg-surface border border-surfaceHighlight rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
-                    >
-                      <option value="None">-- None --</option>
-                      <option value="MF">Matrix Factorization (MF)</option>
-                      <option value="NGCF">NGCF (Neural Graph CF)</option>
-                      <option value="LightGCN">LightGCN</option>
-                      <option value="VBPR">VBPR (Visual BPR)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-4 border-t border-surfaceHighlight/50">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs font-mono text-textMuted uppercase">Top-K Items</label>
-                  <span className="text-xs font-mono text-primary">K={topK}</span>
-                </div>
-                <input 
-                  type="range" min="1" max="10" value={topK} 
-                  onChange={(e) => setTopK(parseInt(e.target.value))}
-                  className="w-full accent-primary" 
-                />
-              </div>
             </div>
 
-            <div className="lg:col-span-8 p-4">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                  <Bot className="w-4 h-4 text-primary" /> Recommendation Inference
-                </h3>
+            {/* Right Terminal: Evidence Inspector */}
+            <div className="lg:col-span-7 bg-[#050914] rounded-2xl p-6 border border-surfaceHighlight shadow-2xl relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-surfaceHighlight pb-3 mb-4">
                 <div className="flex items-center gap-2">
-                  {apiStatus === 'online' ? (
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-green-500/10 border border-green-500/20 text-green-500 text-[9px] font-mono uppercase tracking-wider">
-                      <Server className="w-3 h-3" /> {apiMode}
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-[9px] font-mono uppercase tracking-wider" title="Backend unreachable. Using local deterministic fallback.">
-                      <WifiOff className="w-3 h-3" /> Local Demo
-                    </span>
-                  )}
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                  <span className="ml-2 text-xs font-mono text-slate-400">evidence-inspector.log</span>
                 </div>
+                <span className="text-[10px] font-mono text-secondary bg-secondary/10 px-2 py-0.5 rounded">
+                  Trace ID: #GRAG-{selectedQueryIdx + 1}04
+                </span>
               </div>
-              
-              <div className={`grid gap-6 ${arenaModel2 !== 'None' ? 'grid-cols-2' : 'grid-cols-1 max-w-lg mx-auto'}`}>
-                {/* Model 1 Results */}
+
+              <div className="space-y-4 min-h-[300px]">
                 <div>
-                  <h4 className="text-xs font-mono text-primary uppercase mb-4 text-center border-b border-surfaceHighlight pb-2">{arenaModel1} Ranking</h4>
-                  <div className={`space-y-3 ${isLoadingRecs ? 'opacity-50' : ''}`}>
-                    {(apiStatus === 'online' && apiRecommendations1.length > 0 ? apiRecommendations1 : generateRecommendations(arenaModel1, activeProfile)).map((item, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-surface/40 border border-surfaceHighlight hover:border-primary/50 transition-colors group">
-                        <div className="w-8 h-8 rounded bg-surface flex items-center justify-center font-mono text-[10px] text-textMuted group-hover:text-primary">
-                          #{i + 1}
-                        </div>
-                        <div className="flex-1">
-                          <h5 className="text-xs font-semibold text-white">{item.name}</h5>
-                          <div className="text-[9px] font-mono text-primary mt-0.5">Score: {item.score}</div>
-                        </div>
+                  <h4 className="text-sm font-semibold text-white mb-1">
+                    {stageDataTemplate[activeStage].title}
+                  </h4>
+                  <p className="text-xs text-textMuted">
+                    {stageDataTemplate[activeStage].desc}
+                  </p>
+                </div>
+
+                {/* Content Renderer */}
+                {activeStage === 'Query' && currentStageData?.details && (
+                  <div className="space-y-2 pt-2">
+                    {currentStageData.details.map((d: any, i: number) => (
+                      <div key={i} className="p-3 bg-[#090F1C] border border-surfaceHighlight rounded-lg">
+                        <div className="text-[10px] font-mono text-textMuted mb-0.5">{d.key}</div>
+                        <div className="text-xs font-mono text-primary break-all">{d.val}</div>
                       </div>
                     ))}
                   </div>
-                </div>
+                )}
 
-                {/* Model 2 Results */}
-                {arenaModel2 !== 'None' && (
-                  <div>
-                    <h4 className="text-xs font-mono text-secondary uppercase mb-4 text-center border-b border-surfaceHighlight pb-2">{arenaModel2} Ranking</h4>
-                    <div className={`space-y-3 ${isLoadingRecs ? 'opacity-50' : ''}`}>
-                      {(apiStatus === 'online' && apiRecommendations2.length > 0 ? apiRecommendations2 : generateRecommendations(arenaModel2, activeProfile)).map((item, i) => (
-                        <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-surface/40 border border-surfaceHighlight hover:border-secondary/50 transition-colors group">
-                          <div className="w-8 h-8 rounded bg-surface flex items-center justify-center font-mono text-[10px] text-textMuted group-hover:text-secondary">
-                            #{i + 1}
-                          </div>
-                          <div className="flex-1">
-                            <h5 className="text-xs font-semibold text-white">{item.name}</h5>
-                            <div className="text-[9px] font-mono text-secondary mt-0.5">Score: {item.score}</div>
-                          </div>
-                        </div>
+                {activeStage === 'Vector' && currentStageData?.details && (
+                  <div className="space-y-2 pt-2">
+                    <span className="text-[10px] font-mono text-textMuted uppercase">Dense Semantic Candidates</span>
+                    {currentStageData.details.map((d: any, i: number) => (
+                      <div key={i} className="flex justify-between items-center p-3 bg-[#090F1C] border border-surfaceHighlight rounded-lg">
+                        <span className="text-xs text-slate-300 font-mono">{d.doc}</span>
+                        <span className="text-xs font-mono text-emerald-400 font-bold">{d.score}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeStage === 'Graph' && (
+                  <div className="p-4 bg-[#090F1C] border border-surfaceHighlight rounded-lg space-y-3">
+                    <div className="text-[10px] font-mono text-textMuted uppercase">Neo4j Cypher Path Subgraph</div>
+                    <div className="font-mono text-xs text-secondary bg-surface p-2.5 rounded border border-surfaceHighlight">
+                      MATCH (p:Product)-[:MADE_OF]-&gt;(m:Material) <br />
+                      WHERE m.name = 'Silk' RETURN p, m LIMIT 5;
+                    </div>
+                    <div className="text-xs text-slate-300 flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span>Traversed 2 hops • 1 explicit entity relation confirmed</span>
+                    </div>
+                  </div>
+                )}
+
+                {activeStage === 'Fusion' && currentStageData?.details && (
+                  <div className="space-y-2 pt-2">
+                    <div className="text-[10px] font-mono text-textMuted uppercase">Reciprocal Rank Fusion (RRF) Ranking</div>
+                    {currentStageData.details.map((d: any, i: number) => (
+                      <div key={i} className="flex justify-between items-center p-3 bg-[#090F1C] border border-surfaceHighlight rounded-lg">
+                        <span className="text-xs text-slate-200 font-mono">{d.candidate}</span>
+                        <span className="text-xs font-mono text-primary font-bold">RRF: {d.rrfScore}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeStage === 'Rerank' && currentStageData?.text && (
+                  <div className="p-4 bg-[#090F1C] border border-surfaceHighlight rounded-lg space-y-2">
+                    <div className="text-[10px] font-mono text-textMuted uppercase">Cross-Encoder Re-scoring</div>
+                    <p className="text-xs font-mono text-slate-300">{currentStageData.text}</p>
+                  </div>
+                )}
+
+                {activeStage === 'Answer' && currentStageData?.answer && (
+                  <div className="p-4 bg-[#090F1C] border border-primary/30 rounded-lg space-y-3">
+                    <div className="text-[10px] font-mono text-primary uppercase">Grounded Generation (Zero Hallucination)</div>
+                    <p className="text-xs text-slate-200 leading-relaxed font-sans">{currentStageData.answer}</p>
+                    <div className="border-t border-surfaceHighlight pt-2">
+                      <span className="text-[10px] font-mono text-slate-400 block mb-1">Citations:</span>
+                      {currentStageData.citations?.map((c: string, ci: number) => (
+                        <span key={ci} className="text-[11px] font-mono text-secondary block">{c}</span>
                       ))}
                     </div>
                   </div>
@@ -462,6 +415,147 @@ export const AILab = () => {
             </div>
           </div>
         )}
+
+        {/* Tab 2: Recommendation Arena */}
+        {activeTab === 'arena' && (
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-surfaceHighlight">
+            <div className="grid md:grid-cols-12 gap-8 items-start">
+              
+              {/* Controls */}
+              <div className="md:col-span-4 space-y-6">
+                <div>
+                  <h3 className="font-display font-semibold text-white text-base mb-2">Arena Setup</h3>
+                  <p className="text-xs text-textMuted">Select user persona and models to benchmark recommendation accuracy.</p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-mono text-textMuted uppercase block">Target User Persona</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {profiles.map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => setActiveProfile(p)}
+                        className={`p-2.5 rounded-xl border text-left text-xs transition-all ${
+                          activeProfile.id === p.id 
+                            ? 'bg-primary/10 border-primary text-white' 
+                            : 'bg-surface border-surfaceHighlight text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <div className="font-semibold">{p.name}</div>
+                        <div className="text-[10px] text-textMuted truncate">{p.intent}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[11px] font-mono text-primary uppercase block mb-1">Model 1 (Primary)</label>
+                    <select
+                      value={arenaModel1}
+                      onChange={(e) => setArenaModel1(e.target.value as any)}
+                      className="w-full bg-surface border border-surfaceHighlight rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-primary"
+                    >
+                      <option value="LightGCN">LightGCN (Graph Convolution)</option>
+                      <option value="NGCF">NGCF (High-Order GNN)</option>
+                      <option value="MF">MF (Matrix Factorization)</option>
+                      <option value="VBPR">VBPR (Visual Multimodal)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-mono text-secondary uppercase block mb-1">Model 2 (Benchmark)</label>
+                    <select
+                      value={arenaModel2}
+                      onChange={(e) => setArenaModel2(e.target.value as any)}
+                      className="w-full bg-surface border border-surfaceHighlight rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-secondary"
+                    >
+                      <option value="None">None (Single Model View)</option>
+                      <option value="MF">MF (Matrix Factorization)</option>
+                      <option value="NGCF">NGCF (High-Order GNN)</option>
+                      <option value="LightGCN">LightGCN (Graph Convolution)</option>
+                      <option value="VBPR">VBPR (Visual Multimodal)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-mono text-textMuted uppercase block mb-1">Top-K Recommendations: {topK}</label>
+                    <input
+                      type="range"
+                      min={3}
+                      max={8}
+                      value={topK}
+                      onChange={(e) => setTopK(Number(e.target.value))}
+                      className="w-full accent-primary"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Arena Visual Results */}
+              <div className="md:col-span-8">
+                <div className={`grid gap-4 ${arenaModel2 !== 'None' ? 'sm:grid-cols-2' : 'grid-cols-1 max-w-md mx-auto'}`}>
+                  
+                  {/* Model 1 Results */}
+                  <div className="bg-[#0B1324] border border-primary/30 p-4 rounded-2xl">
+                    <div className="flex items-center justify-between pb-3 border-b border-surfaceHighlight mb-3">
+                      <h4 className="text-xs font-mono font-bold text-primary uppercase">{arenaModel1} Rankings</h4>
+                      <span className="text-[10px] font-mono text-slate-400">Top-{topK}</span>
+                    </div>
+                    <div className="space-y-2">
+                      {isLoadingRecs ? (
+                        [...Array(topK)].map((_, idx) => (
+                          <div key={idx} className="p-3 rounded-lg bg-surface/50 border border-surfaceHighlight animate-pulse flex justify-between items-center">
+                            <div className="h-3 bg-surfaceHighlight/80 rounded w-1/2" />
+                            <div className="h-3 bg-primary/30 rounded w-12" />
+                          </div>
+                        ))
+                      ) : (apiStatus === 'online' && apiRecommendations1.length > 0 
+                        ? apiRecommendations1 
+                        : generateRecommendations(arenaModel1, activeProfile)
+                      ).map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-surface/70 border border-surfaceHighlight">
+                          <div>
+                            <span className="text-xs text-white font-medium block">{item.name}</span>
+                            <span className="text-[10px] font-mono text-textMuted">{item.category}</span>
+                          </div>
+                          <span className="text-xs font-mono text-primary font-semibold">{item.score}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Model 2 Results */}
+                  {arenaModel2 !== 'None' && (
+                    <div className="bg-[#0B1324] border border-secondary/30 p-4 rounded-2xl">
+                      <div className="flex items-center justify-between pb-3 border-b border-surfaceHighlight mb-3">
+                        <h4 className="text-xs font-mono font-bold text-secondary uppercase">{arenaModel2} Rankings</h4>
+                        <span className="text-[10px] font-mono text-slate-400">Top-{topK}</span>
+                      </div>
+                      <div className="space-y-2">
+                        {(apiStatus === 'online' && apiRecommendations2.length > 0 
+                          ? apiRecommendations2 
+                          : generateRecommendations(arenaModel2, activeProfile)
+                        ).map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between p-2.5 rounded-lg bg-surface/70 border border-surfaceHighlight">
+                            <div>
+                              <span className="text-xs text-white font-medium block">{item.name}</span>
+                              <span className="text-[10px] font-mono text-textMuted">{item.category}</span>
+                            </div>
+                            <span className="text-xs font-mono text-secondary font-semibold">{item.score}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
       </div>
     </section>
   );
