@@ -23,7 +23,7 @@ def test_get_recommendations():
     response = client.post("/api/recommendations", json=payload)
     assert response.status_code == 200
     data = response.json()
-    assert data["mode"] == "DEMO MODE"
+    assert data["mode"] == "SIMULATION"
     assert len(data["items"]) == 3
     assert data["items"][0]["score"] > 0
 

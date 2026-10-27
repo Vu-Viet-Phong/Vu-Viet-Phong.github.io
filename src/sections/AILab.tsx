@@ -45,6 +45,7 @@ export const AILab = () => {
   const [apiMode, setApiMode] = useState<string>('SIMULATION');
   const [apiRecommendations1, setApiRecommendations1] = useState<any[]>([]);
   const [apiRecommendations2, setApiRecommendations2] = useState<any[]>([]);
+  const [isLoadingRecs, setIsLoadingRecs] = useState<boolean>(false);
 
   useEffect(() => {
     const checkApi = async () => {
@@ -124,6 +125,7 @@ export const AILab = () => {
     if (apiStatus !== 'online') return;
     
     const fetchRecs = async () => {
+      setIsLoadingRecs(true);
       try {
         const res1 = await apiClient.post('/recommendations', { user_id: activeProfile.id, model: arenaModel1, top_k: topK });
         setApiRecommendations1(res1.items || []);
@@ -136,6 +138,8 @@ export const AILab = () => {
         }
       } catch {
         setApiStatus('offline');
+      } finally {
+        setIsLoadingRecs(false);
       }
     };
     fetchRecs();
@@ -499,7 +503,14 @@ export const AILab = () => {
                       <span className="text-[10px] font-mono text-slate-400">Top-{topK}</span>
                     </div>
                     <div className="space-y-2">
-                      {(apiStatus === 'online' && apiRecommendations1.length > 0 
+                      {isLoadingRecs ? (
+                        [...Array(topK)].map((_, idx) => (
+                          <div key={idx} className="p-3 rounded-lg bg-surface/50 border border-surfaceHighlight animate-pulse flex justify-between items-center">
+                            <div className="h-3 bg-surfaceHighlight/80 rounded w-1/2" />
+                            <div className="h-3 bg-primary/30 rounded w-12" />
+                          </div>
+                        ))
+                      ) : (apiStatus === 'online' && apiRecommendations1.length > 0 
                         ? apiRecommendations1 
                         : generateRecommendations(arenaModel1, activeProfile)
                       ).map((item, idx) => (

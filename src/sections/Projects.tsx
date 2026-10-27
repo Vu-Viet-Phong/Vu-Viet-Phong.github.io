@@ -26,6 +26,23 @@ const modelsInfo: Record<ModelType, { desc: string; blocks: string[] }> = {
 export const Projects = () => {
   const [activeModel, setActiveModel] = useState<ModelType>('LightGCN');
   const [activeTab, setActiveTab] = useState<TabType>('architecture');
+  const [matrixCells, setMatrixCells] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    for (let u = 1; u <= 4; u++) {
+      for (let i = 1; i <= 5; i++) {
+        initial[`${u}-${i}`] = (u * i) % 3 === 0;
+      }
+    }
+    return initial;
+  });
+
+  const toggleCell = (u: number, i: number) => {
+    const key = `${u}-${i}`;
+    setMatrixCells((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const activeCount = Object.values(matrixCells).filter(Boolean).length;
+  const sparsityPercent = ((1 - activeCount / 20) * 100).toFixed(1);
 
   const currentInfo = modelsInfo[activeModel];
 
@@ -194,11 +211,14 @@ export const Projects = () => {
 
                     {/* Interactive Sparse Matrix Demo */}
                     <div className="p-4 rounded-xl bg-surface/20 border border-surfaceHighlight/40">
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                         <span className="text-[10px] font-mono text-primary uppercase tracking-wider font-semibold">
                           Sparse Interaction Matrix R (User-Item Bipartite Graph)
                         </span>
-                        <span className="text-[10px] font-mono text-textMuted">Hover cells to inspect</span>
+                        <div className="flex items-center gap-3 text-[10px] font-mono">
+                          <span className="text-emerald-400">Interactions: {activeCount}/20</span>
+                          <span className="text-textMuted">Sparsity: {sparsityPercent}%</span>
+                        </div>
                       </div>
                       <div className="grid grid-cols-6 gap-1.5 max-w-xs mx-auto p-3 bg-[#090F1C] rounded-lg border border-surfaceHighlight">
                         <div className="text-[9px] text-center font-mono text-textMuted border-b border-surfaceHighlight pb-1">U \ I</div>
@@ -209,22 +229,28 @@ export const Projects = () => {
                           <React.Fragment key={`u${u}`}>
                             <div className="text-[9px] text-center font-mono text-textMuted border-r border-surfaceHighlight pr-1 flex items-center justify-center">u{u}</div>
                             {[1, 2, 3, 4, 5].map((i) => {
-                              const isActive = (u * i) % 3 === 0;
+                              const isActive = !!matrixCells[`${u}-${i}`];
                               return (
-                                <div 
+                                <button
+                                  type="button"
                                   key={`cell-${u}-${i}`} 
+                                  onClick={() => toggleCell(u, i)}
                                   className={`w-full aspect-square rounded-[3px] transition-all cursor-pointer ${
                                     isActive 
                                       ? 'bg-primary/80 shadow-[0_0_6px_rgba(34,211,238,0.5)] hover:scale-110' 
-                                      : 'bg-surfaceHighlight/40 hover:bg-surfaceHighlight'
+                                      : 'bg-surfaceHighlight/40 hover:bg-surfaceHighlight hover:scale-105'
                                   }`}
-                                  title={isActive ? `Implicit Positive: User u${u} purchased Item i${i}` : `Unobserved Pair (u${u}, i${i})`}
+                                  title={`Click to toggle: User u${u} and Item i${i} (${isActive ? 'Interacted' : 'Unobserved'})`}
+                                  aria-label={`User ${u} Item ${i} ${isActive ? 'Interacted' : 'Unobserved'}`}
                                 />
                               );
                             })}
                           </React.Fragment>
                         ))}
                       </div>
+                      <span className="block text-center text-[10px] font-mono text-textMuted mt-2">
+                        *Click any cell to toggle interaction state and dynamically update sparsity ratio.
+                      </span>
                     </div>
                   </div>
                 )}
