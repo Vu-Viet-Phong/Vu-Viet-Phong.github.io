@@ -35,9 +35,17 @@ def test_api_mf_real_inference():
     res = client.post("/api/recommendations", json=payload)
     assert res.status_code == 200
     data = res.json()
-    assert data["mode"] == "REAL_INFERENCE"
+    assert data["mode"] == "SAMPLE_SVD_INFERENCE"
     assert data["model"] == "MF"
     assert len(data["items"]) == 3
+
+def test_engine_transparency_metrics():
+    engine = MatrixFactorizationEngine(rank=4)
+    res = engine.recommend(user_id="u1", top_k=5)
+    assert res["is_sample_slice"] is True
+    assert "disclaimer" in res["dataset_info"]
+    assert "explained_variance_ratio" in res["mathematical_metrics"]
+    assert res["mathematical_metrics"]["explained_variance_ratio"] > 0.5
 
 def test_api_gnn_simulation_honesty():
     payload = {"user_id": "u1", "model": "LightGCN", "top_k": 3}

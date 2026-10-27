@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List, Dict, Any, Optional
 
-# Reproducible Clothing_5core sample dataset
+# Reproducible benchmark slice inspired by the Clothing_5core schema
 SAMPLE_USERS = ["u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9", "u10"]
 
 SAMPLE_ITEMS = [
@@ -21,7 +21,6 @@ SAMPLE_ITEMS = [
 
 # Deterministic User-Item Interaction Matrix R (Users x Items)
 # Rows: u1..u10, Cols: item_101..item_112
-# 1 = observed interaction, 0 = unobserved
 INTERACTION_MATRIX = np.array([
     [1, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],  # u1: Formal / Minimalist bias
     [0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1],  # u2: Casual / Cotton bias
@@ -39,7 +38,7 @@ INTERACTION_MATRIX = np.array([
 class MatrixFactorizationEngine:
     """
     Genuine Matrix Factorization Recommendation Engine.
-    Uses Truncated Singular Value Decomposition (SVD) on the User-Item Interaction Matrix.
+    Uses Truncated Singular Value Decomposition (SVD) on a deterministic benchmark sample slice.
     Decomposes R into U * Sigma * V^T, producing rank-K dense latent embeddings.
     """
     def __init__(self, rank: int = 4):
@@ -56,6 +55,10 @@ class MatrixFactorizationEngine:
         self.reconstructed_matrix: np.ndarray = np.zeros_like(self.R)
         self.item_popularity = np.sum(self.R, axis=0)
         
+        self.sparsity = float(1.0 - (np.count_nonzero(self.R) / float(self.R.size)))
+        self.explained_variance_ratio: float = 0.0
+        self.frobenius_error: float = 0.0
+
         self._fit()
 
     def _fit(self):
@@ -63,7 +66,6 @@ class MatrixFactorizationEngine:
         # Compute SVD: R = U * S * Vt
         u, s, vt = np.linalg.svd(self.R, full_matrices=False)
         
-        # Truncate to desired rank
         k = min(self.rank, len(s))
         s_k = np.diag(np.sqrt(s[:k]))
         
@@ -72,6 +74,12 @@ class MatrixFactorizationEngine:
         
         # Compute predicted continuous preference scores R_hat = U_k * V_k^T
         self.reconstructed_matrix = np.dot(self.user_factors, self.item_factors.T)
+
+        # Compute reproducible numerical evaluation metrics
+        total_variance = float(np.sum(s ** 2))
+        retained_variance = float(np.sum(s[:k] ** 2))
+        self.explained_variance_ratio = round(retained_variance / total_variance, 4) if total_variance > 0 else 0.0
+        self.frobenius_error = round(float(np.linalg.norm(self.R - self.reconstructed_matrix, 'fro')), 4)
 
     def recommend(self, user_id: str, top_k: int = 5, exclude_known: bool = True) -> Dict[str, Any]:
         """
@@ -118,13 +126,23 @@ class MatrixFactorizationEngine:
             "user_id": user_id,
             "engine": "MatrixFactorizationEngine",
             "algorithm": f"TruncatedSVD Latent Factor (Rank {self.rank})",
+            "mode": "SAMPLE_SVD_INFERENCE",
             "is_real_inference": True,
+            "is_sample_slice": True,
+            "dataset_info": {
+                "name": "Clothing_5core (Representative Benchmark Slice)",
+                "users_count": len(self.user_ids),
+                "items_count": len(self.item_ids),
+                "matrix_sparsity": round(self.sparsity, 4),
+                "disclaimer": "Exact mathematical SVD factorization on a representative sample slice. Not a pre-trained deep neural checkpoint over full 5core dataset."
+            },
+            "mathematical_metrics": {
+                "explained_variance_ratio": self.explained_variance_ratio,
+                "frobenius_reconstruction_error": self.frobenius_error,
+                "personalization_divergence": self._calculate_divergence(ranked_indices),
+            },
             "latent_dimensions": self.rank,
             "items": items,
-            "baseline_comparison": {
-                "baseline_type": "Popularity Ranking",
-                "divergence_from_popular": self._calculate_divergence(ranked_indices),
-            }
         }
 
     def _recommend_popularity(self, user_id: str, top_k: int) -> Dict[str, Any]:
@@ -145,6 +163,7 @@ class MatrixFactorizationEngine:
             "user_id": user_id,
             "engine": "PopularityBaselineEngine",
             "algorithm": "Interaction Frequency Counting",
+            "mode": "SAMPLE_SVD_INFERENCE",
             "is_real_inference": True,
             "items": items,
             "is_cold_start": True

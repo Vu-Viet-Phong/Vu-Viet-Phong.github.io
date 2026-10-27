@@ -55,12 +55,12 @@ def get_recommendations(req: RecommendationRequest):
         raise HTTPException(status_code=422, detail="top_k must be between 1 and 20")
 
     if req.model == "MF":
-        # Genuine real inference execution via SVD latent factor decomposition
+        # Mathematical SVD inference on reproducible benchmark slice
         rec_data = real_mf_engine.recommend(user_id=req.user_id, top_k=req.top_k)
         return RecommendationResponse(
             user_id=req.user_id,
             model="MF",
-            mode="REAL_INFERENCE",
+            mode="SAMPLE_SVD_INFERENCE",
             items=rec_data["items"]
         )
     else:
