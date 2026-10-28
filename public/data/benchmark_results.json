@@ -1,11 +1,11 @@
 {
   "metadata": {
-    "dataset": "Amazon Review Data (Clothing, Shoes and Jewelry - 5-core)",
-    "dataset_version": "UCSD 5-core Release (He & McAuley, WWW 2016)",
+    "dataset": "Curated Amazon Clothing Benchmark (16x20 Research Sample)",
+    "dataset_version": "16x20 Curated Research Slice (based on UCSD He & McAuley WWW 2016 schema)",
     "source": "https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/Clothing_Shoes_and_Jewelry_5.json.gz",
     "license": "Creative Commons Attribution-NonCommercial (Academic Research Use)",
     "citation": "R. He, J. McAuley. Ups and downs: Modeling the visual evolution of fashion trends with one-class collaborative filtering. WWW 2016.",
-    "benchmark_timestamp": "2026-10-28T08:20:50Z",
+    "benchmark_timestamp": "2026-10-28T09:28:55Z",
     "primary_seed": 42,
     "stability_seeds": [
       42,
@@ -20,7 +20,9 @@
     "test_interactions_count": 16,
     "sparsity": 0.7469,
     "checkpoint_sha256": "515a953096dbdf8d924b5ddf0f08fec7da0b50f599f7749f5a7f1451c12f57e9",
-    "evaluation_protocol": "User-stratified 80/20 train/test split. Test set strictly unobserved during training. Evaluated with Recall@10 and NDCG@10."
+    "provenance_type": "CURATED_EDUCATIONAL_SAMPLE",
+    "disclaimer": "Curated 16-user x 20-item research sample adhering to Julian McAuley's Amazon Clothing 5-core schema. Designed for reproducible, zero-cost CPU demonstration, not the full 278,677 review dataset.",
+    "evaluation_protocol": "Curated 16x20 research sample with user-stratified 80/20 train/test split. Test set strictly unobserved during training. Evaluated with Recall@10 and NDCG@10 across seeds [42, 100, 2026]."
   },
   "empirical_models": {
     "LightGCN": {
@@ -49,7 +51,7 @@
         "ndcg@10": 0.241,
         "evaluated_users": 16
       },
-      "latency_ms": 25.11,
+      "latency_ms": 21.61,
       "parameters": 576,
       "checkpoint_id": "lightgcn_v4_515a9530",
       "provenance": "Trained PyTorch graph convolution model with BPR pairwise loss on normalized bipartite graph."

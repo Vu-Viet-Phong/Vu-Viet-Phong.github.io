@@ -129,12 +129,15 @@ class ProductionRecommendationEngine:
         ranked_scores = raw_scores.copy()
         ranked_scores[known_mask] = -1e9
 
-        top_indices = np.argsort(ranked_scores)[::-1][:top_k]
+        # Use standard candidate pool of 10 items for consistent normalization matching offline export
+        pool_size = max(10, top_k)
+        pool_indices = np.argsort(ranked_scores)[::-1][:pool_size]
         
-        # Normalize scores to [0.65, 0.99]
-        sub_scores = raw_scores[top_indices]
-        s_min, s_max = float(np.min(sub_scores)), float(np.max(sub_scores))
+        s_min = float(np.min(raw_scores[pool_indices]))
+        s_max = float(np.max(raw_scores[pool_indices]))
         denom = (s_max - s_min) if (s_max - s_min) > 1e-6 else 1.0
+
+        top_indices = pool_indices[:top_k]
 
         items = []
         for idx in top_indices:
@@ -147,14 +150,15 @@ class ProductionRecommendationEngine:
                 "category": it["category"],
                 "style": it["style"],
                 "price": it["price"],
-                "raw_latent_score": round(float(raw_scores[idx]), 4)
+                "raw_latent_score": round(float(raw_scores[idx]), 4),
+                "latent_dot_product": round(float(raw_scores[idx]), 4)
             })
 
         return {
             "user_id": user_id,
             "model": model_name,
             "mode": mode,
-            "dataset": "Amazon Review Data (Clothing, Shoes & Jewelry 5-core)",
+            "dataset": "Curated Amazon Clothing Benchmark (16x20 Research Sample)",
             "metrics": {
                 "top_k": top_k,
                 "retained_factors": 16 if model_name == "LightGCN" else 4,

@@ -89,3 +89,25 @@ def test_amazon_ingestion_pipeline_authenticity():
     assert res["statistics"]["num_users"] == 16
     assert res["statistics"]["num_items"] == 20
 
+def test_inference_score_and_dot_product_consistency():
+    """Verify that live backend inference exactly matches precomputed checkpoint rankings down to < 1e-4."""
+    import json
+    import os
+    res = client.post("/api/recommendations", json={"user_id": "usr_00", "model": "LightGCN", "top_k": 5})
+    assert res.status_code == 200
+    live_data = res.json()
+    assert live_data["mode"] == "LIVE_INFERENCE"
+
+    pca_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "app", "ml", "checkpoints", "embeddings_pca.json")
+    assert os.path.exists(pca_path)
+    with open(pca_path, "r", encoding="utf-8") as f:
+        pca_data = json.load(f)
+
+    precomp = pca_data["precomputed_16d_rankings"]["usr_00"][:5]
+    for i in range(5):
+        live_item = live_data["items"][i]
+        precomp_item = precomp[i]
+        assert live_item["id"] == precomp_item["id"], f"Rank mismatch at #{i+1}"
+        assert abs(live_item["score"] - precomp_item["score"]) < 1e-4, f"Score mismatch: {live_item['score']} vs {precomp_item['score']}"
+        assert abs(live_item["latent_dot_product"] - precomp_item["latent_dot_product"]) < 1e-4, f"Dot mismatch: {live_item['latent_dot_product']} vs {precomp_item['latent_dot_product']}"
+

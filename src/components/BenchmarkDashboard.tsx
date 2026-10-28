@@ -68,7 +68,7 @@ export const BenchmarkDashboard: React.FC<Props> = ({ className = '' }) => {
                 <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
                   isLive ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-primary/10 text-primary border-primary/30'
                 }`}>
-                  {isLive ? 'LIVE FASTAPI' : 'VERIFIED LOCAL CHECKPOINT'}
+                  {isLive ? 'LIVE FASTAPI' : 'LOCAL CACHED CHECKPOINT'}
                 </span>
               </h3>
               <p className="text-xs text-textMuted font-light">
@@ -81,7 +81,7 @@ export const BenchmarkDashboard: React.FC<Props> = ({ className = '' }) => {
         {/* Provenance Tag */}
         <div className="flex items-center gap-2 text-xs font-mono text-textMuted bg-surface px-3 py-1.5 rounded-lg border border-surfaceHighlight">
           <Database className="w-3.5 h-3.5 text-primary" />
-          <span>Amazon Review Data: Clothing (5-core)</span>
+          <span>Curated Amazon Clothing (16x20)</span>
         </div>
       </div>
 
@@ -90,7 +90,7 @@ export const BenchmarkDashboard: React.FC<Props> = ({ className = '' }) => {
         <div className="flex items-center gap-2 mb-3">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
           <h4 className="text-xs font-mono uppercase text-emerald-400 tracking-wider font-semibold">
-            1. Verified Empirical Models (Trained & Evaluated on Actual Data)
+            1. Curated Empirical Models (Trained on 16x20 Research Sample)
           </h4>
         </div>
         
@@ -241,7 +241,7 @@ export const BenchmarkDashboard: React.FC<Props> = ({ className = '' }) => {
             </span>
           </div>
           <p className="text-xs text-slate-300 font-light leading-relaxed">
-            <strong>Source:</strong> Julian McAuley Lab, UC San Diego (He & McAuley, WWW 2016).
+            <strong>Schema:</strong> Julian McAuley Lab, UC San Diego (WWW 2016). Evaluated on curated 16x20 research sample (81 interactions) for zero-cost CPU reproducibility.
             Partitioned with fixed pseudo-random seed (<code className="text-primary font-mono">seed=42</code>) to strictly prohibit interaction leakage.
           </p>
           <div className="pt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-mono text-textMuted">

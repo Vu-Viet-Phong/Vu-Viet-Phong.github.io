@@ -77,7 +77,10 @@ export const AILab = () => {
     };
     checkApi();
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      apiClient.stopColdStartWakePoller();
+    };
   }, []);
 
   const runSimulation = () => {
@@ -165,7 +168,7 @@ export const AILab = () => {
     };
     fetchRecs();
     return () => { isMounted = false; };
-  }, [activeProfile, arenaModel1, arenaModel2, topK]);
+  }, [activeProfile, arenaModel1, arenaModel2, topK, apiStatus]);
 
   return (
     <section id="lab" className="py-24 bg-[#090F1C] relative border-t border-surfaceHighlight/40">

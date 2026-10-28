@@ -20,6 +20,7 @@ class RankedItem(BaseModel):
     style: Optional[str] = None
     price: Optional[float] = None
     raw_latent_score: Optional[float] = None
+    latent_dot_product: Optional[float] = None
     attributes: Optional[Dict[str, str]] = None
 
 class RecommendationResponse(BaseModel):

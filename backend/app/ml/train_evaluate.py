@@ -216,7 +216,9 @@ def run_training_pipeline():
             "test_interactions_count": len(benchmark.test_interactions),
             "sparsity": round(benchmark.sparsity, 4),
             "checkpoint_sha256": checkpoint_sha256,
-            "evaluation_protocol": "User-stratified 80/20 train/test split. Test set strictly unobserved during training. Evaluated with Recall@10 and NDCG@10."
+            "provenance_type": AMAZON_CLOTHING_METADATA["provenance_type"],
+            "disclaimer": AMAZON_CLOTHING_METADATA["disclaimer"],
+            "evaluation_protocol": "Curated 16x20 research sample with user-stratified 80/20 train/test split. Test set strictly unobserved during training. Evaluated with Recall@10 and NDCG@10 across seeds [42, 100, 2026]."
         },
         # GROUP 1: EMPIRICAL MODELS (Trained & Evaluated on actual data)
         "empirical_models": {

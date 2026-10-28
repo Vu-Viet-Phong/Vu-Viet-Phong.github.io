@@ -12,7 +12,7 @@ export interface ModelMetric {
   category?: 'VERIFIED_EMPIRICAL' | 'THEORETICAL_SIMULATION';
   type?: string;
   framework?: string;
-  mode: 'LIVE_INFERENCE' | 'SAMPLE_SVD_INFERENCE' | 'SIMULATION' | 'LOCAL_VERIFIED_CHECKPOINT';
+  mode: 'LIVE_INFERENCE' | 'SAMPLE_SVD_INFERENCE' | 'SIMULATION' | 'LOCAL_CLIENT_CHECKPOINT' | 'OFFLINE_SAMPLE_FALLBACK';
   live: boolean;
   layers?: number;
   embedding_dim?: number;
@@ -106,7 +106,7 @@ export interface RecommendationItem {
 export interface RecommendationResponse {
   user_id: string;
   model: string;
-  mode: 'LIVE_INFERENCE' | 'SAMPLE_SVD_INFERENCE' | 'SIMULATION' | 'LOCAL_VERIFIED_CHECKPOINT';
+  mode: 'LIVE_INFERENCE' | 'SAMPLE_SVD_INFERENCE' | 'SIMULATION' | 'LOCAL_CLIENT_CHECKPOINT' | 'OFFLINE_SAMPLE_FALLBACK';
   dataset?: string;
   metrics?: Record<string, any>;
   items: RecommendationItem[];
@@ -114,15 +114,44 @@ export interface RecommendationResponse {
   coldStartNotice?: string;
 }
 
+export type ApiErrorType = 'TIMEOUT' | 'HTTP_ERROR' | 'NETWORK_OFFLINE';
+
+export class ApiError extends Error {
+  type: ApiErrorType;
+  status?: number;
+
+  constructor(message: string, type: ApiErrorType, status?: number) {
+    super(message);
+    this.name = 'ApiError';
+    this.type = type;
+    this.status = status;
+  }
+}
+
 let _isOnline = false;
 let _isColdStarting = false;
-type ConnectionListener = (state: { isOnline: boolean; isColdStarting: boolean }) => void;
+let _lastErrorType: ApiErrorType | null = null;
+let _isPollerActive = false;
+let _pollerTimer: any = null;
+
+export interface ConnectionState {
+  isOnline: boolean;
+  isColdStarting: boolean;
+  lastErrorType: ApiErrorType | null;
+}
+
+type ConnectionListener = (state: ConnectionState) => void;
 const connectionListeners: Set<ConnectionListener> = new Set();
 
 function notifyListeners() {
+  const state: ConnectionState = {
+    isOnline: _isOnline,
+    isColdStarting: _isColdStarting,
+    lastErrorType: _lastErrorType
+  };
   connectionListeners.forEach((listener) => {
     try {
-      listener({ isOnline: _isOnline, isColdStarting: _isColdStarting });
+      listener(state);
     } catch {
       // Ignore listener error
     }
@@ -132,12 +161,20 @@ function notifyListeners() {
 export const apiClient = {
   subscribeConnection(listener: ConnectionListener) {
     connectionListeners.add(listener);
-    listener({ isOnline: _isOnline, isColdStarting: _isColdStarting });
+    listener({
+      isOnline: _isOnline,
+      isColdStarting: _isColdStarting,
+      lastErrorType: _lastErrorType
+    });
     return () => { connectionListeners.delete(listener); };
   },
 
-  getConnectionState() {
-    return { isOnline: _isOnline, isColdStarting: _isColdStarting };
+  getConnectionState(): ConnectionState {
+    return {
+      isOnline: _isOnline,
+      isColdStarting: _isColdStarting,
+      lastErrorType: _lastErrorType
+    };
   },
 
   async pingHealth(timeoutMs: number = 2500): Promise<boolean> {
@@ -152,13 +189,19 @@ export const apiClient = {
       if (response.ok) {
         _isOnline = true;
         _isColdStarting = false;
+        _lastErrorType = null;
         notifyListeners();
         return true;
       }
+      _isOnline = false;
+      _lastErrorType = 'HTTP_ERROR';
+      _isColdStarting = false;
+      notifyListeners();
       return false;
-    } catch {
+    } catch (err: any) {
       clearTimeout(timeoutId);
       _isOnline = false;
+      _lastErrorType = err?.name === 'AbortError' ? 'TIMEOUT' : 'NETWORK_OFFLINE';
       _isColdStarting = true;
       notifyListeners();
       return false;
@@ -167,24 +210,50 @@ export const apiClient = {
 
   /**
    * Background poller with exponential backoff to detect when Render backend finishes cold-start wake up
+   * Total coverage: >115 seconds, avoiding duplicate concurrent executions.
    */
-  startColdStartWakePoller(maxAttempts: number = 4) {
-    const backoffs = [3000, 6000, 12000, 24000];
+  startColdStartWakePoller(maxAttempts: number = 8) {
+    if (_isPollerActive || _isOnline) return;
+    _isPollerActive = true;
+
+    const backoffs = [3000, 5000, 8000, 12000, 16000, 20000, 25000, 30000];
     let attempt = 0;
 
     const poll = async () => {
-      if (_isOnline || attempt >= maxAttempts) return;
+      if (!_isPollerActive || _isOnline) {
+        _isPollerActive = false;
+        return;
+      }
+
+      if (attempt >= maxAttempts) {
+        _isPollerActive = false;
+        return;
+      }
+
       const awake = await this.pingHealth(3000);
       if (awake) {
         console.info('[VuAnalytics] Backend successfully awakened from cold start.');
+        _isPollerActive = false;
         return;
       }
-      const delay = backoffs[attempt] || 24000;
+
+      const delay = backoffs[attempt] || 30000;
       attempt++;
-      setTimeout(poll, delay);
+      _pollerTimer = setTimeout(poll, delay);
     };
 
-    setTimeout(poll, 1500);
+    _pollerTimer = setTimeout(poll, 1500);
+  },
+
+  /**
+   * Stop any active cold-start polling
+   */
+  stopColdStartWakePoller() {
+    _isPollerActive = false;
+    if (_pollerTimer) {
+      clearTimeout(_pollerTimer);
+      _pollerTimer = null;
+    }
   },
 
   async get(endpoint: string, timeoutMs: number = 4000) {
@@ -197,17 +266,26 @@ export const apiClient = {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
-      if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+      if (!response.ok) {
+        throw new ApiError(`HTTP Error: ${response.status}`, 'HTTP_ERROR', response.status);
+      }
       _isOnline = true;
       _isColdStarting = false;
+      _lastErrorType = null;
       notifyListeners();
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       clearTimeout(timeoutId);
+      const isAbort = error?.name === 'AbortError';
+      const classifiedError = error instanceof ApiError
+        ? error
+        : new ApiError(error?.message || 'Network request failed', isAbort ? 'TIMEOUT' : 'NETWORK_OFFLINE');
+
       _isOnline = false;
-      _isColdStarting = true;
+      _lastErrorType = classifiedError.type;
+      _isColdStarting = (classifiedError.type === 'TIMEOUT' || classifiedError.type === 'NETWORK_OFFLINE');
       notifyListeners();
-      throw error;
+      throw classifiedError;
     }
   },
 
@@ -222,17 +300,26 @@ export const apiClient = {
         signal: controller.signal
       });
       clearTimeout(timeoutId);
-      if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+      if (!response.ok) {
+        throw new ApiError(`HTTP Error: ${response.status}`, 'HTTP_ERROR', response.status);
+      }
       _isOnline = true;
       _isColdStarting = false;
+      _lastErrorType = null;
       notifyListeners();
       return await response.json();
-    } catch (error) {
+    } catch (error: any) {
       clearTimeout(timeoutId);
+      const isAbort = error?.name === 'AbortError';
+      const classifiedError = error instanceof ApiError
+        ? error
+        : new ApiError(error?.message || 'Network request failed', isAbort ? 'TIMEOUT' : 'NETWORK_OFFLINE');
+
       _isOnline = false;
-      _isColdStarting = true;
+      _lastErrorType = classifiedError.type;
+      _isColdStarting = (classifiedError.type === 'TIMEOUT' || classifiedError.type === 'NETWORK_OFFLINE');
       notifyListeners();
-      throw error;
+      throw classifiedError;
     }
   },
 
@@ -283,8 +370,8 @@ export const apiClient = {
           service: 'vuanalytics-backend (Offline / Sleeping on Render Free Tier)',
           environment: 'offline_client_fallback',
           models: {
-            LightGCN: { mode: 'LOCAL_VERIFIED_CHECKPOINT', checkpoint_loaded: true },
-            MF: { mode: 'SAMPLE_SVD_INFERENCE' },
+            LightGCN: { mode: 'LOCAL_CLIENT_CHECKPOINT', checkpoint_loaded: false, client_cached: true },
+            MF: { mode: 'OFFLINE_SAMPLE_FALLBACK' },
             NGCF: { mode: 'SIMULATION' },
             VBPR: { mode: 'SIMULATION' }
           }
@@ -312,8 +399,8 @@ export const apiClient = {
         return {
           user_id: userId,
           model: 'LightGCN',
-          mode: 'LOCAL_VERIFIED_CHECKPOINT',
-          dataset: 'Amazon Review Data (Clothing 5-core Verified Checkpoint)',
+          mode: 'LOCAL_CLIENT_CHECKPOINT',
+          dataset: 'Curated Amazon Clothing Benchmark (16x20 Client Cached Checkpoint)',
           metrics: {
             top_k: topK,
             latent_space: '16-dimensional dot-product E_u^T E_i',
@@ -321,7 +408,7 @@ export const apiClient = {
           },
           items: precomputed.slice(0, topK),
           isFallback: true,
-          coldStartNotice: 'FastAPI cloud backend is sleeping or spinning up. Serving true 16D latent recommendations from verified PyTorch checkpoint.'
+          coldStartNotice: 'FastAPI cloud backend is offline or sleeping on Render Free Tier. Serving true 16D latent recommendations from verified local PyTorch checkpoint.'
         };
       }
 
@@ -339,12 +426,12 @@ export const apiClient = {
       return {
         user_id: userId,
         model,
-        mode: model === 'MF' ? 'SAMPLE_SVD_INFERENCE' : 'SIMULATION',
-        dataset: 'Amazon Review Data (Clothing 5-core)',
+        mode: model === 'MF' ? 'OFFLINE_SAMPLE_FALLBACK' : 'SIMULATION',
+        dataset: 'Curated Amazon Clothing Benchmark (16x20)',
         metrics: { top_k: topK, offline: true },
         items,
         isFallback: true,
-        coldStartNotice: 'Serving offline sample slice.'
+        coldStartNotice: 'Serving deterministic client-side sample slice while backend is unavailable.'
       };
     }
   }

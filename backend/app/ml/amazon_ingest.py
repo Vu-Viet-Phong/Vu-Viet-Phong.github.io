@@ -17,21 +17,23 @@ import hashlib
 from typing import List, Dict, Any, Tuple
 import numpy as np
 
-# Official Source Metadata
+# Curated Benchmark Source Metadata
 AMAZON_CLOTHING_METADATA = {
-    "dataset_name": "Amazon Review Data (Clothing, Shoes and Jewelry - 5-core)",
-    "dataset_version": "UCSD 5-core Release (He & McAuley, WWW 2016)",
+    "dataset_name": "Curated Amazon Clothing Benchmark (16x20 Research Sample)",
+    "dataset_version": "16x20 Curated Research Slice (based on UCSD He & McAuley WWW 2016 schema)",
     "official_sources": [
         "https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/Clothing_Shoes_and_Jewelry_5.json.gz",
         "http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/reviews_Clothing_Shoes_and_Jewelry_5.json.gz"
     ],
     "license": "Creative Commons Attribution-NonCommercial (Academic Research Use)",
     "citation": "R. He, J. McAuley. Ups and downs: Modeling the visual evolution of fashion trends with one-class collaborative filtering. WWW 2016.",
-    "provenance_type": "AUTHENTIC_EXTRACTED_5CORE_SUBSET",
+    "provenance_type": "CURATED_EDUCATIONAL_SAMPLE",
+    "disclaimer": "Curated 16-user x 20-item research sample adhering to Julian McAuley's Amazon Clothing 5-core schema. Designed for reproducible, zero-cost CPU demonstration, not the full 278,677 review dataset.",
+    "benchmark_scope": "16 Users, 20 Items, 81 Interactions, 74.69% Sparsity",
     "sha256_verified": True
 }
 
-# Real Amazon Clothing Review records extracted from McAuley's Clothing_Shoes_and_Jewelry 5-core
+# Curated Amazon Clothing Review records structured according to McAuley's Clothing_Shoes_and_Jewelry 5-core schema
 # Schema: (reviewerID, asin, rating, unixTime, title, category, style)
 RAW_AUTHENTIC_INTERACTIONS: List[Dict[str, Any]] = [
     # User A1E1LEVQYXMRD4 (Minimalist / Luxury accessories & shoes)

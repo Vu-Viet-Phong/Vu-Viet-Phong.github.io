@@ -24,21 +24,21 @@ def get_models():
                 "algorithm": "Graph Convolutional Collaborative Filtering (He et al., SIGIR 2020)",
                 "live": engine.lightgcn_loaded,
                 "mode": "LIVE_INFERENCE",
-                "dataset": "Amazon Review Data (Clothing, Shoes & Jewelry 5-core)"
+                "dataset": "Curated Amazon Clothing Benchmark (16x20 Research Sample)"
             },
             "MF": {
                 "engine": "MatrixFactorizationEngine",
                 "algorithm": "TruncatedSVD Latent Factor Decomposition",
                 "live": True,
                 "mode": "SAMPLE_SVD_INFERENCE",
-                "dataset": "Amazon Review Data (Clothing, Shoes & Jewelry 5-core)"
+                "dataset": "Curated Amazon Clothing Benchmark (16x20 Research Sample)"
             },
             "Popularity": {
                 "engine": "PopularityBaselineEngine",
                 "algorithm": "Interaction Frequency Counting",
                 "live": True,
                 "mode": "SAMPLE_SVD_INFERENCE",
-                "dataset": "Amazon Review Data (Clothing, Shoes & Jewelry 5-core)"
+                "dataset": "Curated Amazon Clothing Benchmark (16x20 Research Sample)"
             },
             "NGCF": {
                 "engine": "MMRecSimulationAdapter",

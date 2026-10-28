@@ -1,15 +1,16 @@
 """
-Amazon Review Data (Clothing, Shoes and Jewelry) - Reproducible Benchmark Slice
-Provenance: Julian McAuley UCSD (He & McAuley, WWW 2016 / Ups and Downs, ICDM 2016).
-License: Academic & Educational Research Use.
+Curated Amazon Review Data Benchmark Slice (16 users x 20 items)
+Schema based on: Julian McAuley UCSD (He & McAuley, WWW 2016).
+Type: Curated Educational Research Benchmark.
+License: Academic & Educational Research Use Only.
 """
 
 import numpy as np
 import json
 from typing import List, Dict, Any, Tuple
 
-# Representative 5-core interaction subset from Amazon Clothing, Shoes & Jewelry
-# Schema matches official UCSD Amazon Review Data format
+# Curated 16x20 interaction benchmark based on Amazon Clothing, Shoes & Jewelry schema
+# Formatted for lightweight, reproducible CPU collaborative filtering evaluation
 AMAZON_CLOTHING_ITEMS: List[Dict[str, Any]] = [
     {"asin": "B00004SR8W", "title": "Ray-Ban Aviator Classic Polarized Sunglasses", "category": "Accessories", "style": "Classic", "price": 163.0},
     {"asin": "B000072UM4", "title": "Carhartt Men's Acrylic Watch Beanie Hat", "category": "Knitwear", "style": "Workwear", "price": 19.99},

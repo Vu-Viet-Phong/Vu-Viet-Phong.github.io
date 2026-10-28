@@ -108,12 +108,95 @@ describe('apiClient', () => {
 
     const res = await apiClient.getRecommendations('usr_00', 'LightGCN', 2);
     expect(res.isFallback).toBe(true);
-    expect(res.mode).toBe('LOCAL_VERIFIED_CHECKPOINT');
+    expect(res.mode).toBe('LOCAL_CLIENT_CHECKPOINT');
     expect(res.items.length).toBe(2);
     expect(res.items[0].id).toBe('item_A');
     expect(res.items[0].score).toBe(0.99);
     expect(res.items[0].latent_dot_product).toBe(0.42);
-    expect(res.coldStartNotice).toContain('sleeping or spinning up');
+    expect(res.coldStartNotice).toContain('sleeping on Render Free Tier');
+  });
+
+  it('correctly labels MF offline fallback as OFFLINE_SAMPLE_FALLBACK', async () => {
+    const mockPCAData = {
+      users: [],
+      items: [
+        { id: 'item_1', title: 'Classic Blazer', category: 'Apparel', price: 120 }
+      ]
+    };
+    globalThis.fetch = vi.fn().mockImplementation((url: string) => {
+      if (url.includes('/recommendations')) {
+        return Promise.reject(new Error('Server offline'));
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockPCAData)
+      });
+    });
+
+    const res = await apiClient.getRecommendations('usr_00', 'MF', 1);
+    expect(res.isFallback).toBe(true);
+    expect(res.mode).toBe('OFFLINE_SAMPLE_FALLBACK');
+    expect(res.coldStartNotice).toContain('sample slice');
+  });
+
+  it('differentiates TIMEOUT, HTTP_ERROR, and NETWORK_OFFLINE error types', async () => {
+    // 1. Timeout error
+    const abortErr = new Error('The operation was aborted');
+    abortErr.name = 'AbortError';
+    globalThis.fetch = vi.fn().mockImplementation(() => Promise.reject(abortErr));
+    try {
+      await apiClient.get('/timeout-test', 50);
+    } catch (err: any) {
+      expect(err.type).toBe('TIMEOUT');
+    }
+
+    // 2. HTTP Error 500
+    globalThis.fetch = vi.fn().mockImplementation(() => Promise.resolve({
+      ok: false,
+      status: 500
+    }));
+    try {
+      await apiClient.get('/500-test', 50);
+    } catch (err: any) {
+      expect(err.type).toBe('HTTP_ERROR');
+      expect(err.status).toBe(500);
+    }
+
+    // 3. Network Offline
+    globalThis.fetch = vi.fn().mockImplementation(() => Promise.reject(new TypeError('Failed to fetch')));
+    try {
+      await apiClient.get('/network-err-test', 50);
+    } catch (err: any) {
+      expect(err.type).toBe('NETWORK_OFFLINE');
+    }
+  });
+
+  it('manages cold-start wake poller lifecycle and avoids duplicate pollers', async () => {
+    vi.useFakeTimers();
+    let pollCount = 0;
+    globalThis.fetch = vi.fn().mockImplementation(() => {
+      pollCount++;
+      return Promise.reject(new Error('Server down'));
+    });
+
+    // Start poller
+    apiClient.startColdStartWakePoller(4);
+    // Call again to verify singleton guard (should not double count)
+    apiClient.startColdStartWakePoller(4);
+
+    await vi.advanceTimersByTimeAsync(2000); // Initial 1500ms delay triggers attempt 1
+    expect(pollCount).toBe(1);
+
+    await vi.advanceTimersByTimeAsync(3500); // Next delay 3000ms triggers attempt 2
+    expect(pollCount).toBe(2);
+
+    // Stop poller cleanly
+    apiClient.stopColdStartWakePoller();
+    await vi.advanceTimersByTimeAsync(10000);
+    // Count should not increase after stop
+    expect(pollCount).toBe(2);
+
+    vi.useRealTimers();
   });
 
   it('tracks online and cold-starting states via pingHealth and subscribers', async () => {
