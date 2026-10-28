@@ -2,7 +2,10 @@
  * Robust API Client with Intelligent Offline Fallback & Scientific Integrity for VuAnalytics 4.0
  */
 
-const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const rawBaseUrl = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:8000';
+const cleanBaseUrl = rawBaseUrl.replace(/\/+$/, '');
+export const API_BASE_URL = cleanBaseUrl.endsWith('/api') ? cleanBaseUrl : `${cleanBaseUrl}/api`;
+export const API_ROOT_URL = cleanBaseUrl.endsWith('/api') ? cleanBaseUrl.slice(0, -4) : cleanBaseUrl;
 
 export interface ModelMetric {
   name: string;
@@ -111,7 +114,79 @@ export interface RecommendationResponse {
   coldStartNotice?: string;
 }
 
+let _isOnline = false;
+let _isColdStarting = false;
+type ConnectionListener = (state: { isOnline: boolean; isColdStarting: boolean }) => void;
+const connectionListeners: Set<ConnectionListener> = new Set();
+
+function notifyListeners() {
+  connectionListeners.forEach((listener) => {
+    try {
+      listener({ isOnline: _isOnline, isColdStarting: _isColdStarting });
+    } catch {
+      // Ignore listener error
+    }
+  });
+}
+
 export const apiClient = {
+  subscribeConnection(listener: ConnectionListener) {
+    connectionListeners.add(listener);
+    listener({ isOnline: _isOnline, isColdStarting: _isColdStarting });
+    return () => { connectionListeners.delete(listener); };
+  },
+
+  getConnectionState() {
+    return { isOnline: _isOnline, isColdStarting: _isColdStarting };
+  },
+
+  async pingHealth(timeoutMs: number = 2500): Promise<boolean> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(`${API_ROOT_URL}/health`, {
+        method: 'GET',
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (response.ok) {
+        _isOnline = true;
+        _isColdStarting = false;
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch {
+      clearTimeout(timeoutId);
+      _isOnline = false;
+      _isColdStarting = true;
+      notifyListeners();
+      return false;
+    }
+  },
+
+  /**
+   * Background poller with exponential backoff to detect when Render backend finishes cold-start wake up
+   */
+  startColdStartWakePoller(maxAttempts: number = 4) {
+    const backoffs = [3000, 6000, 12000, 24000];
+    let attempt = 0;
+
+    const poll = async () => {
+      if (_isOnline || attempt >= maxAttempts) return;
+      const awake = await this.pingHealth(3000);
+      if (awake) {
+        console.info('[VuAnalytics] Backend successfully awakened from cold start.');
+        return;
+      }
+      const delay = backoffs[attempt] || 24000;
+      attempt++;
+      setTimeout(poll, delay);
+    };
+
+    setTimeout(poll, 1500);
+  },
+
   async get(endpoint: string, timeoutMs: number = 4000) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -123,9 +198,15 @@ export const apiClient = {
       });
       clearTimeout(timeoutId);
       if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+      _isOnline = true;
+      _isColdStarting = false;
+      notifyListeners();
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);
+      _isOnline = false;
+      _isColdStarting = true;
+      notifyListeners();
       throw error;
     }
   },
@@ -142,9 +223,15 @@ export const apiClient = {
       });
       clearTimeout(timeoutId);
       if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+      _isOnline = true;
+      _isColdStarting = false;
+      notifyListeners();
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);
+      _isOnline = false;
+      _isColdStarting = true;
+      notifyListeners();
       throw error;
     }
   },

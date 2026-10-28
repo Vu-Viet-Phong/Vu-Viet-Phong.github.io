@@ -18,7 +18,7 @@ RUN python -m app.ml.train_evaluate
 EXPOSE 8000
 
 # Set production environment defaults
-ENV ALLOWED_ORIGINS="https://vuanalytics.me,https://vu-viet-phong.github.io,http://localhost:5173"
+ENV ALLOWED_ORIGINS="https://vuanalytics.me,https://vu-viet-phong.github.io,http://localhost:5173,http://localhost:4173,http://localhost:8000,http://127.0.0.1:4173"
 ENV ENV="production"
 
 # Use PORT from Render or default to 8000

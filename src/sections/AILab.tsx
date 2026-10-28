@@ -49,9 +49,19 @@ export const AILab = () => {
   const [isLoadingRecs, setIsLoadingRecs] = useState<boolean>(false);
 
   useEffect(() => {
+    const unsubscribe = apiClient.subscribeConnection(({ isOnline }) => {
+      if (isOnline) {
+        setApiStatus('online');
+        setApiMode('LIVE FASTAPI BACKEND');
+      } else {
+        setApiStatus('offline');
+        setApiMode('LOCAL VERIFIED DATA');
+      }
+    });
+
     const checkApi = async () => {
       try {
-        const res = await apiClient.get('/models');
+        const res = await apiClient.get('/models', 2500);
         if (res && res.models) {
           setApiStatus('online');
           setApiMode('LIVE FASTAPI BACKEND');
@@ -62,9 +72,12 @@ export const AILab = () => {
       } catch {
         setApiStatus('offline');
         setApiMode('LOCAL VERIFIED DATA');
+        apiClient.startColdStartWakePoller();
       }
     };
     checkApi();
+
+    return () => unsubscribe();
   }, []);
 
   const runSimulation = () => {
@@ -538,7 +551,7 @@ export const AILab = () => {
                             <div className="h-3 bg-primary/30 rounded w-12" />
                           </div>
                         ))
-                      ) : (apiStatus === 'online' && apiRecommendations1.length > 0 
+                      ) : (apiRecommendations1.length > 0 
                         ? apiRecommendations1 
                         : generateRecommendations(arenaModel1, activeProfile)
                       ).map((item, idx) => (
@@ -561,7 +574,7 @@ export const AILab = () => {
                         <span className="text-[10px] font-mono text-slate-400">Top-{topK}</span>
                       </div>
                       <div className="space-y-2">
-                        {(apiStatus === 'online' && apiRecommendations2.length > 0 
+                        {(apiRecommendations2.length > 0 
                           ? apiRecommendations2 
                           : generateRecommendations(arenaModel2, activeProfile)
                         ).map((item, idx) => (

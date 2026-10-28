@@ -115,4 +115,32 @@ describe('apiClient', () => {
     expect(res.items[0].latent_dot_product).toBe(0.42);
     expect(res.coldStartNotice).toContain('sleeping or spinning up');
   });
+
+  it('tracks online and cold-starting states via pingHealth and subscribers', async () => {
+    let capturedState: any = null;
+    const unsub = apiClient.subscribeConnection((state) => {
+      capturedState = state;
+    });
+
+    // Test ping failure (sleeping)
+    globalThis.fetch = vi.fn().mockImplementation(() => Promise.reject(new Error('Connection timeout')));
+    const awake1 = await apiClient.pingHealth(100);
+    expect(awake1).toBe(false);
+    expect(capturedState.isOnline).toBe(false);
+    expect(capturedState.isColdStarting).toBe(true);
+
+    // Test ping success (awake)
+    globalThis.fetch = vi.fn().mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({ status: 'ok', service: 'vuanalytics-backend' })
+      })
+    );
+    const awake2 = await apiClient.pingHealth(100);
+    expect(awake2).toBe(true);
+    expect(capturedState.isOnline).toBe(true);
+    expect(capturedState.isColdStarting).toBe(false);
+
+    unsub();
+  });
 });
