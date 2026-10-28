@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Github, Activity, ChevronRight, Layers, Database, ArrowRight, BarChart3, Settings, ExternalLink, Code2, AlertCircle } from 'lucide-react';
+import { BenchmarkDashboard } from '../components/BenchmarkDashboard';
 
 type ModelType = 'MF' | 'NGCF' | 'LightGCN' | 'VBPR';
 type TabType = 'architecture' | 'pipeline' | 'evaluation';
@@ -213,7 +214,7 @@ export const Projects = () => {
                     <div className="p-4 rounded-xl bg-surface/20 border border-surfaceHighlight/40">
                       <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                         <span className="text-[10px] font-mono text-primary uppercase tracking-wider font-semibold">
-                          Sparse Interaction Matrix R (User-Item Bipartite Graph)
+                          Sparse Interaction Matrix R (Interactive 4×5 Bipartite Subgraph)
                         </span>
                         <div className="flex items-center gap-3 text-[10px] font-mono">
                           <span className="text-emerald-400">Interactions: {activeCount}/20</span>
@@ -249,7 +250,7 @@ export const Projects = () => {
                         ))}
                       </div>
                       <span className="block text-center text-[10px] font-mono text-textMuted mt-2">
-                        *Click any cell to toggle interaction state and dynamically update sparsity ratio.
+                        *Interactive 4×5 toy slice demonstrating bipartite connectivity & dynamic sparsity. The full empirical benchmark evaluates over 16 users × 20 items (74.69% sparsity).
                       </span>
                     </div>
                   </div>
@@ -279,15 +280,8 @@ export const Projects = () => {
                 )}
 
                 {activeTab === 'evaluation' && (
-                  <div className="p-6 rounded-xl border border-dashed border-surfaceHighlight bg-surface/10 text-center space-y-3 animate-fade-in-up">
-                    <BarChart3 className="w-8 h-8 text-amber-400 mx-auto opacity-70" />
-                    <h4 className="text-sm font-semibold text-white">Evaluation Protocol</h4>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto">
-                      All models are evaluated under leave-one-out and 80/20 train-test splits. Metrics include Recall@K, NDCG@K, and Precision@K.
-                    </p>
-                    <div className="inline-block px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/20 text-amber-400 text-[10px] font-mono uppercase tracking-wider">
-                      Empirical Checkpoint Publishing In Progress
-                    </div>
+                  <div className="animate-fade-in-up">
+                    <BenchmarkDashboard />
                   </div>
                 )}
               </div>

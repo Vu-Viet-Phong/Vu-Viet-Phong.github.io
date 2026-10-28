@@ -2,6 +2,7 @@ import pytest
 from app.services.real_engine import MatrixFactorizationEngine, SAMPLE_USERS, SAMPLE_ITEMS
 from fastapi.testclient import TestClient
 from app.main import app
+from app.ml.dataset import AmazonClothingBenchmark, compute_ranking_metrics
 
 client = TestClient(app)
 
@@ -47,13 +48,16 @@ def test_engine_transparency_metrics():
     assert "explained_variance_ratio" in res["mathematical_metrics"]
     assert res["mathematical_metrics"]["explained_variance_ratio"] > 0.5
 
-def test_api_gnn_simulation_honesty():
-    payload = {"user_id": "u1", "model": "LightGCN", "top_k": 3}
-    res = client.post("/api/recommendations", json=payload)
-    assert res.status_code == 200
-    data = res.json()
-    # GNN must be labeled as SIMULATION until checkpoints are present
-    assert data["mode"] == "SIMULATION"
+def test_api_gnn_honesty_labels():
+    # LightGCN is live with PyTorch weights
+    res_live = client.post("/api/recommendations", json={"user_id": "u1", "model": "LightGCN", "top_k": 3})
+    assert res_live.status_code == 200
+    assert res_live.json()["mode"] == "LIVE_INFERENCE"
+
+    # NGCF remains in simulation mode
+    res_sim = client.post("/api/recommendations", json={"user_id": "u1", "model": "NGCF", "top_k": 3})
+    assert res_sim.status_code == 200
+    assert res_sim.json()["mode"] == "SIMULATION"
 
 def test_api_input_validation():
     # Invalid top_k (0)
@@ -63,3 +67,25 @@ def test_api_input_validation():
     # Invalid top_k (25 > 20)
     res = client.post("/api/recommendations", json={"user_id": "u1", "model": "MF", "top_k": 25})
     assert res.status_code == 422
+
+def test_dataset_leak_free_split():
+    benchmark = AmazonClothingBenchmark(random_seed=42)
+    train_set = set(benchmark.train_interactions)
+    test_set = set(benchmark.test_interactions)
+    val_set = set(benchmark.val_interactions)
+    
+    # Assert zero overlap (strict leakage prevention)
+    assert len(train_set.intersection(test_set)) == 0
+    assert len(train_set.intersection(val_set)) == 0
+    assert len(val_set.intersection(test_set)) == 0
+
+def test_amazon_ingestion_pipeline_authenticity():
+    from app.ml.amazon_ingest import AmazonClothingIngestionPipeline
+    pipeline = AmazonClothingIngestionPipeline()
+    res = pipeline.run_pipeline()
+    assert res["provenance"]["raw_sha256"] != ""
+    assert res["provenance"]["leak_free_verified"] is True
+    assert res["statistics"]["total_interactions"] == 81
+    assert res["statistics"]["num_users"] == 16
+    assert res["statistics"]["num_items"] == 20
+

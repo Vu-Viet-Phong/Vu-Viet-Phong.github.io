@@ -7,6 +7,6 @@ services:
     healthCheckPath: /health
     envVars:
       - key: ALLOWED_ORIGINS
-        value: "https://vuanalytics.me,http://localhost:5173"
+        value: "https://vuanalytics.me,https://vu-viet-phong.github.io,http://localhost:5173"
       - key: ENV
         value: "production"
