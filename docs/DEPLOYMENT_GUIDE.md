@@ -15,7 +15,7 @@ VuAnalytics 4.0 follows a decoupled hybrid architecture:
 
 | Variable | Recommended Production Value | Description |
 | :--- | :--- | :--- |
-| `ALLOWED_ORIGINS` | `https://vuanalytics.me,https://vu-viet-phong.github.io,http://localhost:5173` | Comma-separated allowed CORS origins |
+| `ALLOWED_ORIGINS` | `https://vuanalytics.me,https://vu-viet-phong.github.io,http://localhost:5173,http://localhost:4173,http://localhost:8000,http://127.0.0.1:4173` | Comma-separated allowed CORS origins |
 | `ENV` | `production` | Set environment mode; hides internal exception stack traces |
 | `PORT` | `8000` (Injected automatically by Render) | Listening web port |
 
