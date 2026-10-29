@@ -1,17 +1,17 @@
-# Agent B — Frontend V3.3
+# Agent B — Premium AI Visualization (V4.0 Verification)
 
-**Workstream:** Visual Components, Interaction Design, Mobile Usability & State Management  
-**Ownership:** `src/sections/**`, `src/components/**`  
-**Status:** In Progress / Stable  
+**Workstream:** Interactive AI Research Visualizations, Benchmark Segregation & Offline Fallback  
+**Ownership:** `src/components/**`, `src/sections/AILab.tsx`, `src/sections/Projects.tsx`, `src/api/**`  
+**Status:** Completed & Verified  
 
 ---
 
-### Task Log
+### Task Completion Log
 
 | Task ID | Description | Status | Evidence / Details |
 | :--- | :--- | :---: | :--- |
-| **B-1** | Interactive Sparse Matrix Dynamic State | **DONE** | In `src/sections/Projects.tsx`, enhanced sparse matrix with clickable cells to toggle interaction states and dynamically recalculate sparsity ratio. |
-| **B-2** | Recommendation Arena Loading Skeletons | **DONE** | Added animated loading skeletons and state indicators during asynchronous model recommendation queries in `src/sections/AILab.tsx`. |
-| **B-3** | Deep-Linkable Neural Knowledge Graph | **DONE** | Updated `InteractiveGraph.tsx` with 10 nodes linked to actual sections (`#projects`, `#lab`, `#research`, `#about`) with reset view and A11y fallback. |
-| **B-4** | Fixed Navigation & ScrollSpy | **DONE** | Created fixed glass header with dynamic section detection, keyboard focus rings, and mobile drawer in `src/sections/Navigation.tsx`. |
-| **B-5** | Design Token Alignment | **DONE** | Standardized Space Grotesk / Inter typography and `#090F1C` / `#111B2E` / `#22D3EE` / `#8B5CF6` palette across all 6 sections. |
+| **B-1** | Benchmark Leaderboard Segregation | **DONE** | Completely segregated `BenchmarkDashboard.tsx` into two distinct tables: (1) Verified Empirical Models (LightGCN, SVD, Popularity) and (2) Theoretical Literature Baselines (NGCF, VBPR), avoiding any misleading mixing. |
+| **B-2** | True 16D Latent Ranking in Explorer | **DONE** | Refactored `EmbeddingExplorer.tsx` to retrieve and display true 16-dimensional dot-product rankings ($E_u^T E_i$) from checkpoint `515a9530` rather than defaulting to 2D PCA Euclidean distance. |
+| **B-3** | Honest Status Mode Pills | **DONE** | Standardized status badges across the UI: `[LIVE FASTAPI]`, `[LOCAL VERIFIED CHECKPOINT]`, and `[THEORETICAL SIMULATION]`. Offline fallback is never labeled `LIVE_INFERENCE`. |
+| **B-4** | Cold-Start Feedback Banner | **DONE** | Added informative cold-start notice in `AILab.tsx` explaining Render Free Tier wake-up latency (~30-50s) and seamless fallback to verified local artifacts. |
+| **B-5** | Dataset Provenance Card Enrichment | **DONE** | Displayed official UCSD dataset citation, evaluation protocol, users/items count, sparsity, and checkpoint SHA256 in `BenchmarkDashboard.tsx`. |

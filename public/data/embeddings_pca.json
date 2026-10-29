@@ -1,0 +1,1816 @@
+{
+  "algorithm": "LightGCN_PyTorch",
+  "dimension_original": 16,
+  "dimension_projected": 2,
+  "ranking_note": "Visual coordinates are 2D PCA projections. True recommendations are computed via 16D latent dot products.",
+  "explained_variance_ratio": [
+    0.3488,
+    0.2719
+  ],
+  "users": [
+    {
+      "id": "usr_00",
+      "name": "Elena Vance",
+      "profile": "Minimalist & Architectural Luxury",
+      "x": -1.2197,
+      "y": 2.9132,
+      "type": "user"
+    },
+    {
+      "id": "usr_01",
+      "name": "Marcus Brody",
+      "profile": "Classic Heritage & Rugged Workwear",
+      "x": 3.4457,
+      "y": 0.6131,
+      "type": "user"
+    },
+    {
+      "id": "usr_02",
+      "name": "Aria Chen",
+      "profile": "Modern Casual & Daily Comfort",
+      "x": -0.2153,
+      "y": -2.9673,
+      "type": "user"
+    },
+    {
+      "id": "usr_03",
+      "name": "David Sterling",
+      "profile": "Executive Outerwear & Formal",
+      "x": -3.3049,
+      "y": -0.3666,
+      "type": "user"
+    },
+    {
+      "id": "usr_04",
+      "name": "Nadia Al-Mansoor",
+      "profile": "Minimalist Silk & Footwear",
+      "x": -2.889,
+      "y": 2.1133,
+      "type": "user"
+    },
+    {
+      "id": "usr_05",
+      "name": "Leo Kirkpatrick",
+      "profile": "Urban Edgy & Leatherwear",
+      "x": -3.4952,
+      "y": -0.5767,
+      "type": "user"
+    },
+    {
+      "id": "usr_06",
+      "name": "Sophia Dubois",
+      "profile": "Sustainable Knitwear & Classic",
+      "x": 2.5389,
+      "y": 2.818,
+      "type": "user"
+    },
+    {
+      "id": "usr_07",
+      "name": "Julian Thorne",
+      "profile": "Outdoor Techwear & Performance",
+      "x": 0.5654,
+      "y": -1.4562,
+      "type": "user"
+    },
+    {
+      "id": "usr_08",
+      "name": "Chloe Moreau",
+      "profile": "Casual Essentials & Denim",
+      "x": 1.6405,
+      "y": -2.1274,
+      "type": "user"
+    },
+    {
+      "id": "usr_09",
+      "name": "Devon Brooks",
+      "profile": "Heritage Boots & Flannels",
+      "x": 3.7837,
+      "y": 0.1371,
+      "type": "user"
+    },
+    {
+      "id": "usr_10",
+      "name": "Zara Jensen",
+      "profile": "Minimalist Clean Silhouette",
+      "x": -1.9668,
+      "y": 2.6589,
+      "type": "user"
+    },
+    {
+      "id": "usr_11",
+      "name": "Thomas Wright",
+      "profile": "Workwear Heavy Duty & Boots",
+      "x": 3.2486,
+      "y": -1.9326,
+      "type": "user"
+    },
+    {
+      "id": "usr_12",
+      "name": "Amara Okafor",
+      "profile": "Contemporary Apparel & Bags",
+      "x": -1.3593,
+      "y": -2.3126,
+      "type": "user"
+    },
+    {
+      "id": "usr_13",
+      "name": "Lucas Silva",
+      "profile": "Casual Streetwear & Sneakers",
+      "x": -2.7413,
+      "y": -2.4128,
+      "type": "user"
+    },
+    {
+      "id": "usr_14",
+      "name": "Mia Lindqvist",
+      "profile": "Scandinavian Wool & Knitwear",
+      "x": -0.1251,
+      "y": 3.3759,
+      "type": "user"
+    },
+    {
+      "id": "usr_15",
+      "name": "Ethan Hawke",
+      "profile": "All-Weather Outerwear & Jackets",
+      "x": 1.3109,
+      "y": 1.4035,
+      "type": "user"
+    }
+  ],
+  "items": [
+    {
+      "id": "B00004SR8W",
+      "title": "Ray-Ban Aviator Classic Polarized Sunglasses",
+      "category": "Accessories",
+      "style": "Classic",
+      "price": 163.0,
+      "x": -2.9749,
+      "y": 1.7253,
+      "type": "item"
+    },
+    {
+      "id": "B000072UM4",
+      "title": "Carhartt Men's Acrylic Watch Beanie Hat",
+      "category": "Knitwear",
+      "style": "Workwear",
+      "price": 19.99,
+      "x": -0.0363,
+      "y": -0.6122,
+      "type": "item"
+    },
+    {
+      "id": "B0000ANHST",
+      "title": "Levi's Men's 501 Original Fit Jeans",
+      "category": "Apparel",
+      "style": "Classic",
+      "price": 59.5,
+      "x": 3.8307,
+      "y": -1.0842,
+      "type": "item"
+    },
+    {
+      "id": "B0001ZNZV6",
+      "title": "Champion Men's Powerblend Fleece Pullover Hoodie",
+      "category": "Apparel",
+      "style": "Casual",
+      "price": 34.99,
+      "x": -0.0175,
+      "y": -2.7722,
+      "type": "item"
+    },
+    {
+      "id": "B0002M9TGO",
+      "title": "Birkenstock Arizona Unisex Leather Slide Sandals",
+      "category": "Footwear",
+      "style": "Casual",
+      "price": 110.0,
+      "x": -1.029,
+      "y": -2.5568,
+      "type": "item"
+    },
+    {
+      "id": "B0006LMG7E",
+      "title": "Pendleton Men's Classic Board Wool Button-Down Shirt",
+      "category": "Apparel",
+      "style": "Classic",
+      "price": 149.0,
+      "x": 3.4079,
+      "y": 1.336,
+      "type": "item"
+    },
+    {
+      "id": "B0007CKO92",
+      "title": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+      "category": "Outerwear",
+      "style": "Minimalist",
+      "price": 75.0,
+      "x": 0.8554,
+      "y": -0.1787,
+      "type": "item"
+    },
+    {
+      "id": "B0009MZ67C",
+      "title": "Barbour Classic Bedale Waxed Cotton Jacket",
+      "category": "Outerwear",
+      "style": "Heritage",
+      "price": 415.0,
+      "x": -1.9805,
+      "y": -1.6131,
+      "type": "item"
+    },
+    {
+      "id": "B000A2K6O4",
+      "title": "Timberland 6-Inch Premium Waterproof Leather Boots",
+      "category": "Footwear",
+      "style": "Workwear",
+      "price": 198.0,
+      "x": 2.8249,
+      "y": 0.8426,
+      "type": "item"
+    },
+    {
+      "id": "B000E0OH1Q",
+      "title": "Clarks Originals Men's Desert Chukka Boot",
+      "category": "Footwear",
+      "style": "Minimalist",
+      "price": 130.0,
+      "x": -3.125,
+      "y": 2.2157,
+      "type": "item"
+    },
+    {
+      "id": "B000FE6P7E",
+      "title": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+      "category": "Apparel",
+      "style": "Minimalist",
+      "price": 18.0,
+      "x": 0.6372,
+      "y": -2.2405,
+      "type": "item"
+    },
+    {
+      "id": "B000G2Y4OU",
+      "title": "Schott NYC Men's Classic Leather Motorcycle Jacket",
+      "category": "Outerwear",
+      "style": "Edgy",
+      "price": 850.0,
+      "x": -3.6518,
+      "y": -1.358,
+      "type": "item"
+    },
+    {
+      "id": "B000H82GB0",
+      "title": "Patagonia Men's Better Sweater Fleece Jacket",
+      "category": "Knitwear",
+      "style": "Outdoor",
+      "price": 149.0,
+      "x": 1.9348,
+      "y": 1.9715,
+      "type": "item"
+    },
+    {
+      "id": "B000H86TFU",
+      "title": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+      "category": "Knitwear",
+      "style": "Heritage",
+      "price": 165.0,
+      "x": -0.0394,
+      "y": 2.1672,
+      "type": "item"
+    },
+    {
+      "id": "B000HQSUY0",
+      "title": "Red Wing Heritage Men's Iron Ranger 6-Inch Boot",
+      "category": "Footwear",
+      "style": "Heritage",
+      "price": 349.99,
+      "x": 2.5626,
+      "y": -1.5148,
+      "type": "item"
+    },
+    {
+      "id": "B000J48V5A",
+      "title": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+      "category": "Outerwear",
+      "style": "Edgy",
+      "price": 190.0,
+      "x": 1.9381,
+      "y": -1.6082,
+      "type": "item"
+    },
+    {
+      "id": "B000J65Z4Q",
+      "title": "Filson Rugged Twill Medium Duffle Bag",
+      "category": "Accessories",
+      "style": "Heritage",
+      "price": 495.0,
+      "x": -0.9135,
+      "y": -1.5958,
+      "type": "item"
+    },
+    {
+      "id": "B000KEGZTK",
+      "title": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+      "category": "Apparel",
+      "style": "Minimalist",
+      "price": 128.0,
+      "x": -1.2711,
+      "y": 2.788,
+      "type": "item"
+    },
+    {
+      "id": "B000N8G5D0",
+      "title": "Common Projects Original Leather Achilles Low Sneakers",
+      "category": "Footwear",
+      "style": "Minimalist",
+      "price": 425.0,
+      "x": -2.6708,
+      "y": -1.5462,
+      "type": "item"
+    },
+    {
+      "id": "B000O3206A",
+      "title": "Uniqlo Ultra Light Down Compact Packable Vest",
+      "category": "Outerwear",
+      "style": "Minimalist",
+      "price": 49.9,
+      "x": 0.5008,
+      "y": 3.7537,
+      "type": "item"
+    }
+  ],
+  "precomputed_16d_rankings": {
+    "usr_00": [
+      {
+        "id": "B00004SR8W",
+        "name": "Ray-Ban Aviator Classic Polarized Sunglasses",
+        "category": "Accessories",
+        "style": "Classic",
+        "price": 163.0,
+        "score": 0.99,
+        "latent_dot_product": 9.1804
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.9822,
+        "latent_dot_product": 8.9106
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.8999,
+        "latent_dot_product": 6.0667
+      },
+      {
+        "id": "B0006LMG7E",
+        "name": "Pendleton Men's Classic Board Wool Button-Down Shirt",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 149.0,
+        "score": 0.7592,
+        "latent_dot_product": 1.2032
+      },
+      {
+        "id": "B000G2Y4OU",
+        "name": "Schott NYC Men's Classic Leather Motorcycle Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 850.0,
+        "score": 0.722,
+        "latent_dot_product": -0.0858
+      },
+      {
+        "id": "B000A2K6O4",
+        "name": "Timberland 6-Inch Premium Waterproof Leather Boots",
+        "category": "Footwear",
+        "style": "Workwear",
+        "price": 198.0,
+        "score": 0.6938,
+        "latent_dot_product": -1.0583
+      },
+      {
+        "id": "B0009MZ67C",
+        "name": "Barbour Classic Bedale Waxed Cotton Jacket",
+        "category": "Outerwear",
+        "style": "Heritage",
+        "price": 415.0,
+        "score": 0.6906,
+        "latent_dot_product": -1.1696
+      },
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.6815,
+        "latent_dot_product": -1.4849
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.6794,
+        "latent_dot_product": -1.5558
+      },
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.65,
+        "latent_dot_product": -2.5733
+      }
+    ],
+    "usr_01": [
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.99,
+        "latent_dot_product": 7.8036
+      },
+      {
+        "id": "B000HQSUY0",
+        "name": "Red Wing Heritage Men's Iron Ranger 6-Inch Boot",
+        "category": "Footwear",
+        "style": "Heritage",
+        "price": 349.99,
+        "score": 0.9581,
+        "latent_dot_product": 6.8555
+      },
+      {
+        "id": "B000O3206A",
+        "name": "Uniqlo Ultra Light Down Compact Packable Vest",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 49.9,
+        "score": 0.9122,
+        "latent_dot_product": 5.4872
+      },
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.8848,
+        "latent_dot_product": 4.673
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.8112,
+        "latent_dot_product": 2.4816
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.7874,
+        "latent_dot_product": 1.7744
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.7741,
+        "latent_dot_product": 1.3776
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.6977,
+        "latent_dot_product": -0.896
+      },
+      {
+        "id": "B0001ZNZV6",
+        "name": "Champion Men's Powerblend Fleece Pullover Hoodie",
+        "category": "Apparel",
+        "style": "Casual",
+        "price": 34.99,
+        "score": 0.6586,
+        "latent_dot_product": -2.0583
+      },
+      {
+        "id": "B000KEGZTK",
+        "name": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 128.0,
+        "score": 0.65,
+        "latent_dot_product": -2.3153
+      }
+    ],
+    "usr_02": [
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.99,
+        "latent_dot_product": 4.22
+      },
+      {
+        "id": "B0000ANHST",
+        "name": "Levi's Men's 501 Original Fit Jeans",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 59.5,
+        "score": 0.9719,
+        "latent_dot_product": 3.8185
+      },
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.9435,
+        "latent_dot_product": 3.1875
+      },
+      {
+        "id": "B000G2Y4OU",
+        "name": "Schott NYC Men's Classic Leather Motorcycle Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 850.0,
+        "score": 0.8854,
+        "latent_dot_product": 1.8973
+      },
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.8784,
+        "latent_dot_product": 1.7433
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.8306,
+        "latent_dot_product": 0.6825
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.7453,
+        "latent_dot_product": -1.2128
+      },
+      {
+        "id": "B000KEGZTK",
+        "name": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 128.0,
+        "score": 0.7033,
+        "latent_dot_product": -2.1439
+      },
+      {
+        "id": "B0009MZ67C",
+        "name": "Barbour Classic Bedale Waxed Cotton Jacket",
+        "category": "Outerwear",
+        "style": "Heritage",
+        "price": 415.0,
+        "score": 0.6595,
+        "latent_dot_product": -3.1167
+      },
+      {
+        "id": "B000HQSUY0",
+        "name": "Red Wing Heritage Men's Iron Ranger 6-Inch Boot",
+        "category": "Footwear",
+        "style": "Heritage",
+        "price": 349.99,
+        "score": 0.65,
+        "latent_dot_product": -3.3276
+      }
+    ],
+    "usr_03": [
+      {
+        "id": "B00004SR8W",
+        "name": "Ray-Ban Aviator Classic Polarized Sunglasses",
+        "category": "Accessories",
+        "style": "Classic",
+        "price": 163.0,
+        "score": 0.99,
+        "latent_dot_product": 7.9355
+      },
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.9375,
+        "latent_dot_product": 6.1881
+      },
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.9346,
+        "latent_dot_product": 6.0896
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.8275,
+        "latent_dot_product": 2.5228
+      },
+      {
+        "id": "B000KEGZTK",
+        "name": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 128.0,
+        "score": 0.7865,
+        "latent_dot_product": 1.1566
+      },
+      {
+        "id": "B0002M9TGO",
+        "name": "Birkenstock Arizona Unisex Leather Slide Sandals",
+        "category": "Footwear",
+        "style": "Casual",
+        "price": 110.0,
+        "score": 0.7556,
+        "latent_dot_product": 0.1293
+      },
+      {
+        "id": "B000O3206A",
+        "name": "Uniqlo Ultra Light Down Compact Packable Vest",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 49.9,
+        "score": 0.7291,
+        "latent_dot_product": -0.7534
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.7258,
+        "latent_dot_product": -0.8642
+      },
+      {
+        "id": "B0001ZNZV6",
+        "name": "Champion Men's Powerblend Fleece Pullover Hoodie",
+        "category": "Apparel",
+        "style": "Casual",
+        "price": 34.99,
+        "score": 0.716,
+        "latent_dot_product": -1.1895
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.65,
+        "latent_dot_product": -3.3892
+      }
+    ],
+    "usr_04": [
+      {
+        "id": "B000G2Y4OU",
+        "name": "Schott NYC Men's Classic Leather Motorcycle Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 850.0,
+        "score": 0.99,
+        "latent_dot_product": 7.2312
+      },
+      {
+        "id": "B000O3206A",
+        "name": "Uniqlo Ultra Light Down Compact Packable Vest",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 49.9,
+        "score": 0.987,
+        "latent_dot_product": 7.1357
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.9794,
+        "latent_dot_product": 6.8905
+      },
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.9115,
+        "latent_dot_product": 4.6993
+      },
+      {
+        "id": "B0009MZ67C",
+        "name": "Barbour Classic Bedale Waxed Cotton Jacket",
+        "category": "Outerwear",
+        "style": "Heritage",
+        "price": 415.0,
+        "score": 0.7677,
+        "latent_dot_product": 0.0644
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.7454,
+        "latent_dot_product": -0.6557
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.7397,
+        "latent_dot_product": -0.8385
+      },
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.71,
+        "latent_dot_product": -1.7946
+      },
+      {
+        "id": "B0002M9TGO",
+        "name": "Birkenstock Arizona Unisex Leather Slide Sandals",
+        "category": "Footwear",
+        "style": "Casual",
+        "price": 110.0,
+        "score": 0.7014,
+        "latent_dot_product": -2.0731
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.65,
+        "latent_dot_product": -3.7303
+      }
+    ],
+    "usr_05": [
+      {
+        "id": "B000E0OH1Q",
+        "name": "Clarks Originals Men's Desert Chukka Boot",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 130.0,
+        "score": 0.99,
+        "latent_dot_product": 9.1233
+      },
+      {
+        "id": "B0002M9TGO",
+        "name": "Birkenstock Arizona Unisex Leather Slide Sandals",
+        "category": "Footwear",
+        "style": "Casual",
+        "price": 110.0,
+        "score": 0.8935,
+        "latent_dot_product": 5.6455
+      },
+      {
+        "id": "B0009MZ67C",
+        "name": "Barbour Classic Bedale Waxed Cotton Jacket",
+        "category": "Outerwear",
+        "style": "Heritage",
+        "price": 415.0,
+        "score": 0.8163,
+        "latent_dot_product": 2.8617
+      },
+      {
+        "id": "B000KEGZTK",
+        "name": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 128.0,
+        "score": 0.7934,
+        "latent_dot_product": 2.0382
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.7357,
+        "latent_dot_product": -0.041
+      },
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.706,
+        "latent_dot_product": -1.1144
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.702,
+        "latent_dot_product": -1.2558
+      },
+      {
+        "id": "B0001ZNZV6",
+        "name": "Champion Men's Powerblend Fleece Pullover Hoodie",
+        "category": "Apparel",
+        "style": "Casual",
+        "price": 34.99,
+        "score": 0.6835,
+        "latent_dot_product": -1.9221
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.6765,
+        "latent_dot_product": -2.1751
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.65,
+        "latent_dot_product": -3.1312
+      }
+    ],
+    "usr_06": [
+      {
+        "id": "B000A2K6O4",
+        "name": "Timberland 6-Inch Premium Waterproof Leather Boots",
+        "category": "Footwear",
+        "style": "Workwear",
+        "price": 198.0,
+        "score": 0.99,
+        "latent_dot_product": 8.917
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.9528,
+        "latent_dot_product": 7.7625
+      },
+      {
+        "id": "B000KEGZTK",
+        "name": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 128.0,
+        "score": 0.927,
+        "latent_dot_product": 6.9601
+      },
+      {
+        "id": "B0000ANHST",
+        "name": "Levi's Men's 501 Original Fit Jeans",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 59.5,
+        "score": 0.9196,
+        "latent_dot_product": 6.7311
+      },
+      {
+        "id": "B000HQSUY0",
+        "name": "Red Wing Heritage Men's Iron Ranger 6-Inch Boot",
+        "category": "Footwear",
+        "style": "Heritage",
+        "price": 349.99,
+        "score": 0.7147,
+        "latent_dot_product": 0.3703
+      },
+      {
+        "id": "B000E0OH1Q",
+        "name": "Clarks Originals Men's Desert Chukka Boot",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 130.0,
+        "score": 0.71,
+        "latent_dot_product": 0.2256
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.7024,
+        "latent_dot_product": -0.0104
+      },
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.6767,
+        "latent_dot_product": -0.8082
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.6717,
+        "latent_dot_product": -0.9616
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.65,
+        "latent_dot_product": -1.6366
+      }
+    ],
+    "usr_07": [
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.99,
+        "latent_dot_product": 3.6458
+      },
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.9799,
+        "latent_dot_product": 3.4466
+      },
+      {
+        "id": "B000A2K6O4",
+        "name": "Timberland 6-Inch Premium Waterproof Leather Boots",
+        "category": "Footwear",
+        "style": "Workwear",
+        "price": 198.0,
+        "score": 0.9789,
+        "latent_dot_product": 3.4265
+      },
+      {
+        "id": "B000G2Y4OU",
+        "name": "Schott NYC Men's Classic Leather Motorcycle Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 850.0,
+        "score": 0.8132,
+        "latent_dot_product": 0.1414
+      },
+      {
+        "id": "B0000ANHST",
+        "name": "Levi's Men's 501 Original Fit Jeans",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 59.5,
+        "score": 0.7898,
+        "latent_dot_product": -0.3216
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.783,
+        "latent_dot_product": -0.4554
+      },
+      {
+        "id": "B000E0OH1Q",
+        "name": "Clarks Originals Men's Desert Chukka Boot",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 130.0,
+        "score": 0.704,
+        "latent_dot_product": -2.0216
+      },
+      {
+        "id": "B0006LMG7E",
+        "name": "Pendleton Men's Classic Board Wool Button-Down Shirt",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 149.0,
+        "score": 0.6855,
+        "latent_dot_product": -2.3878
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.6672,
+        "latent_dot_product": -2.7509
+      },
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.65,
+        "latent_dot_product": -3.092
+      }
+    ],
+    "usr_08": [
+      {
+        "id": "B0002M9TGO",
+        "name": "Birkenstock Arizona Unisex Leather Slide Sandals",
+        "category": "Footwear",
+        "style": "Casual",
+        "price": 110.0,
+        "score": 0.99,
+        "latent_dot_product": 5.9953
+      },
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.9293,
+        "latent_dot_product": 4.5003
+      },
+      {
+        "id": "B0006LMG7E",
+        "name": "Pendleton Men's Classic Board Wool Button-Down Shirt",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 149.0,
+        "score": 0.9189,
+        "latent_dot_product": 4.2437
+      },
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.8217,
+        "latent_dot_product": 1.8526
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.8044,
+        "latent_dot_product": 1.4263
+      },
+      {
+        "id": "B000HQSUY0",
+        "name": "Red Wing Heritage Men's Iron Ranger 6-Inch Boot",
+        "category": "Footwear",
+        "style": "Heritage",
+        "price": 349.99,
+        "score": 0.7858,
+        "latent_dot_product": 0.9672
+      },
+      {
+        "id": "B000A2K6O4",
+        "name": "Timberland 6-Inch Premium Waterproof Leather Boots",
+        "category": "Footwear",
+        "style": "Workwear",
+        "price": 198.0,
+        "score": 0.7673,
+        "latent_dot_product": 0.5125
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.7572,
+        "latent_dot_product": 0.2639
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.7028,
+        "latent_dot_product": -1.0751
+      },
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.65,
+        "latent_dot_product": -2.3748
+      }
+    ],
+    "usr_09": [
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.99,
+        "latent_dot_product": 7.3886
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.9704,
+        "latent_dot_product": 6.6843
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.9131,
+        "latent_dot_product": 4.6233
+      },
+      {
+        "id": "B000O3206A",
+        "name": "Uniqlo Ultra Light Down Compact Packable Vest",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 49.9,
+        "score": 0.8754,
+        "latent_dot_product": 3.2667
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.7923,
+        "latent_dot_product": 0.2772
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.7758,
+        "latent_dot_product": -0.3185
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.7626,
+        "latent_dot_product": -0.7905
+      },
+      {
+        "id": "B0001ZNZV6",
+        "name": "Champion Men's Powerblend Fleece Pullover Hoodie",
+        "category": "Apparel",
+        "style": "Casual",
+        "price": 34.99,
+        "score": 0.703,
+        "latent_dot_product": -2.9353
+      },
+      {
+        "id": "B0002M9TGO",
+        "name": "Birkenstock Arizona Unisex Leather Slide Sandals",
+        "category": "Footwear",
+        "style": "Casual",
+        "price": 110.0,
+        "score": 0.6528,
+        "latent_dot_product": -4.7416
+      },
+      {
+        "id": "B000KEGZTK",
+        "name": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 128.0,
+        "score": 0.65,
+        "latent_dot_product": -4.8429
+      }
+    ],
+    "usr_10": [
+      {
+        "id": "B000KEGZTK",
+        "name": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 128.0,
+        "score": 0.99,
+        "latent_dot_product": 9.5585
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.8514,
+        "latent_dot_product": 4.8279
+      },
+      {
+        "id": "B000G2Y4OU",
+        "name": "Schott NYC Men's Classic Leather Motorcycle Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 850.0,
+        "score": 0.8405,
+        "latent_dot_product": 4.4563
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.7747,
+        "latent_dot_product": 2.2078
+      },
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.7564,
+        "latent_dot_product": 1.5855
+      },
+      {
+        "id": "B0009MZ67C",
+        "name": "Barbour Classic Bedale Waxed Cotton Jacket",
+        "category": "Outerwear",
+        "style": "Heritage",
+        "price": 415.0,
+        "score": 0.7553,
+        "latent_dot_product": 1.5458
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.7413,
+        "latent_dot_product": 1.0706
+      },
+      {
+        "id": "B000A2K6O4",
+        "name": "Timberland 6-Inch Premium Waterproof Leather Boots",
+        "category": "Footwear",
+        "style": "Workwear",
+        "price": 198.0,
+        "score": 0.702,
+        "latent_dot_product": -0.2709
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.6508,
+        "latent_dot_product": -2.0192
+      },
+      {
+        "id": "B0006LMG7E",
+        "name": "Pendleton Men's Classic Board Wool Button-Down Shirt",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 149.0,
+        "score": 0.65,
+        "latent_dot_product": -2.0473
+      }
+    ],
+    "usr_11": [
+      {
+        "id": "B0006LMG7E",
+        "name": "Pendleton Men's Classic Board Wool Button-Down Shirt",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 149.0,
+        "score": 0.99,
+        "latent_dot_product": 6.976
+      },
+      {
+        "id": "B000A2K6O4",
+        "name": "Timberland 6-Inch Premium Waterproof Leather Boots",
+        "category": "Footwear",
+        "style": "Workwear",
+        "price": 198.0,
+        "score": 0.9732,
+        "latent_dot_product": 6.4626
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.8633,
+        "latent_dot_product": 3.0959
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.8537,
+        "latent_dot_product": 2.8043
+      },
+      {
+        "id": "B0001ZNZV6",
+        "name": "Champion Men's Powerblend Fleece Pullover Hoodie",
+        "category": "Apparel",
+        "style": "Casual",
+        "price": 34.99,
+        "score": 0.7929,
+        "latent_dot_product": 0.9419
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.7879,
+        "latent_dot_product": 0.79
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.7756,
+        "latent_dot_product": 0.4137
+      },
+      {
+        "id": "B0002M9TGO",
+        "name": "Birkenstock Arizona Unisex Leather Slide Sandals",
+        "category": "Footwear",
+        "style": "Casual",
+        "price": 110.0,
+        "score": 0.7376,
+        "latent_dot_product": -0.7518
+      },
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.6587,
+        "latent_dot_product": -3.1676
+      },
+      {
+        "id": "B0009MZ67C",
+        "name": "Barbour Classic Bedale Waxed Cotton Jacket",
+        "category": "Outerwear",
+        "style": "Heritage",
+        "price": 415.0,
+        "score": 0.65,
+        "latent_dot_product": -3.4329
+      }
+    ],
+    "usr_12": [
+      {
+        "id": "B000G2Y4OU",
+        "name": "Schott NYC Men's Classic Leather Motorcycle Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 850.0,
+        "score": 0.99,
+        "latent_dot_product": 3.7452
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.9504,
+        "latent_dot_product": 3.0277
+      },
+      {
+        "id": "B0002M9TGO",
+        "name": "Birkenstock Arizona Unisex Leather Slide Sandals",
+        "category": "Footwear",
+        "style": "Casual",
+        "price": 110.0,
+        "score": 0.8829,
+        "latent_dot_product": 1.804
+      },
+      {
+        "id": "B000E0OH1Q",
+        "name": "Clarks Originals Men's Desert Chukka Boot",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 130.0,
+        "score": 0.8731,
+        "latent_dot_product": 1.6253
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.8061,
+        "latent_dot_product": 0.4118
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.802,
+        "latent_dot_product": 0.337
+      },
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.7175,
+        "latent_dot_product": -1.1951
+      },
+      {
+        "id": "B000HQSUY0",
+        "name": "Red Wing Heritage Men's Iron Ranger 6-Inch Boot",
+        "category": "Footwear",
+        "style": "Heritage",
+        "price": 349.99,
+        "score": 0.6931,
+        "latent_dot_product": -1.637
+      },
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.6722,
+        "latent_dot_product": -2.0165
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.65,
+        "latent_dot_product": -2.4189
+      }
+    ],
+    "usr_13": [
+      {
+        "id": "B00004SR8W",
+        "name": "Ray-Ban Aviator Classic Polarized Sunglasses",
+        "category": "Accessories",
+        "style": "Classic",
+        "price": 163.0,
+        "score": 0.99,
+        "latent_dot_product": 4.9869
+      },
+      {
+        "id": "B0001ZNZV6",
+        "name": "Champion Men's Powerblend Fleece Pullover Hoodie",
+        "category": "Apparel",
+        "style": "Casual",
+        "price": 34.99,
+        "score": 0.9258,
+        "latent_dot_product": 3.3214
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.9146,
+        "latent_dot_product": 3.0289
+      },
+      {
+        "id": "B0009MZ67C",
+        "name": "Barbour Classic Bedale Waxed Cotton Jacket",
+        "category": "Outerwear",
+        "style": "Heritage",
+        "price": 415.0,
+        "score": 0.8948,
+        "latent_dot_product": 2.515
+      },
+      {
+        "id": "B000E0OH1Q",
+        "name": "Clarks Originals Men's Desert Chukka Boot",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 130.0,
+        "score": 0.8517,
+        "latent_dot_product": 1.3958
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.8233,
+        "latent_dot_product": 0.6606
+      },
+      {
+        "id": "B000J65Z4Q",
+        "name": "Filson Rugged Twill Medium Duffle Bag",
+        "category": "Accessories",
+        "style": "Heritage",
+        "price": 495.0,
+        "score": 0.8037,
+        "latent_dot_product": 0.1508
+      },
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.6902,
+        "latent_dot_product": -2.7957
+      },
+      {
+        "id": "B000KEGZTK",
+        "name": "Everlane Minimalist Relaxed Silk Button-Up Shirt",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 128.0,
+        "score": 0.667,
+        "latent_dot_product": -3.3985
+      },
+      {
+        "id": "B0007CKO92",
+        "name": "Columbia Men's Watertight II Waterproof Packable Rain Jacket",
+        "category": "Outerwear",
+        "style": "Minimalist",
+        "price": 75.0,
+        "score": 0.65,
+        "latent_dot_product": -3.8396
+      }
+    ],
+    "usr_14": [
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.99,
+        "latent_dot_product": 8.8746
+      },
+      {
+        "id": "B000E0OH1Q",
+        "name": "Clarks Originals Men's Desert Chukka Boot",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 130.0,
+        "score": 0.9706,
+        "latent_dot_product": 8.1096
+      },
+      {
+        "id": "B00004SR8W",
+        "name": "Ray-Ban Aviator Classic Polarized Sunglasses",
+        "category": "Accessories",
+        "style": "Classic",
+        "price": 163.0,
+        "score": 0.9292,
+        "latent_dot_product": 6.4768
+      },
+      {
+        "id": "B0006LMG7E",
+        "name": "Pendleton Men's Classic Board Wool Button-Down Shirt",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 149.0,
+        "score": 0.911,
+        "latent_dot_product": 5.7617
+      },
+      {
+        "id": "B000A2K6O4",
+        "name": "Timberland 6-Inch Premium Waterproof Leather Boots",
+        "category": "Footwear",
+        "style": "Workwear",
+        "price": 198.0,
+        "score": 0.7862,
+        "latent_dot_product": 0.8428
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.7475,
+        "latent_dot_product": -0.6819
+      },
+      {
+        "id": "B000FE6P7E",
+        "name": "Hanes Men's Premium Ecosmart Crewneck Undershirts (Pack of 3)",
+        "category": "Apparel",
+        "style": "Minimalist",
+        "price": 18.0,
+        "score": 0.734,
+        "latent_dot_product": -1.2126
+      },
+      {
+        "id": "B0000ANHST",
+        "name": "Levi's Men's 501 Original Fit Jeans",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 59.5,
+        "score": 0.7025,
+        "latent_dot_product": -2.4565
+      },
+      {
+        "id": "B000N8G5D0",
+        "name": "Common Projects Original Leather Achilles Low Sneakers",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 425.0,
+        "score": 0.6515,
+        "latent_dot_product": -4.4664
+      },
+      {
+        "id": "B0001ZNZV6",
+        "name": "Champion Men's Powerblend Fleece Pullover Hoodie",
+        "category": "Apparel",
+        "style": "Casual",
+        "price": 34.99,
+        "score": 0.65,
+        "latent_dot_product": -4.524
+      }
+    ],
+    "usr_15": [
+      {
+        "id": "B0006LMG7E",
+        "name": "Pendleton Men's Classic Board Wool Button-Down Shirt",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 149.0,
+        "score": 0.99,
+        "latent_dot_product": 6.0626
+      },
+      {
+        "id": "B000H82GB0",
+        "name": "Patagonia Men's Better Sweater Fleece Jacket",
+        "category": "Knitwear",
+        "style": "Outdoor",
+        "price": 149.0,
+        "score": 0.9167,
+        "latent_dot_product": 4.3091
+      },
+      {
+        "id": "B000HQSUY0",
+        "name": "Red Wing Heritage Men's Iron Ranger 6-Inch Boot",
+        "category": "Footwear",
+        "style": "Heritage",
+        "price": 349.99,
+        "score": 0.8878,
+        "latent_dot_product": 3.6169
+      },
+      {
+        "id": "B0000ANHST",
+        "name": "Levi's Men's 501 Original Fit Jeans",
+        "category": "Apparel",
+        "style": "Classic",
+        "price": 59.5,
+        "score": 0.8354,
+        "latent_dot_product": 2.3638
+      },
+      {
+        "id": "B000E0OH1Q",
+        "name": "Clarks Originals Men's Desert Chukka Boot",
+        "category": "Footwear",
+        "style": "Minimalist",
+        "price": 130.0,
+        "score": 0.7832,
+        "latent_dot_product": 1.1145
+      },
+      {
+        "id": "B0009MZ67C",
+        "name": "Barbour Classic Bedale Waxed Cotton Jacket",
+        "category": "Outerwear",
+        "style": "Heritage",
+        "price": 415.0,
+        "score": 0.7572,
+        "latent_dot_product": 0.4915
+      },
+      {
+        "id": "B000H86TFU",
+        "name": "Woolrich Men's Buffalo Check Wool Flannel Overshirt",
+        "category": "Knitwear",
+        "style": "Heritage",
+        "price": 165.0,
+        "score": 0.7123,
+        "latent_dot_product": -0.5824
+      },
+      {
+        "id": "B00004SR8W",
+        "name": "Ray-Ban Aviator Classic Polarized Sunglasses",
+        "category": "Accessories",
+        "style": "Classic",
+        "price": 163.0,
+        "score": 0.7061,
+        "latent_dot_product": -0.7314
+      },
+      {
+        "id": "B000J48V5A",
+        "name": "Alpha Industries MA-1 Heritage Flight Bomber Jacket",
+        "category": "Outerwear",
+        "style": "Edgy",
+        "price": 190.0,
+        "score": 0.6579,
+        "latent_dot_product": -1.8838
+      },
+      {
+        "id": "B000072UM4",
+        "name": "Carhartt Men's Acrylic Watch Beanie Hat",
+        "category": "Knitwear",
+        "style": "Workwear",
+        "price": 19.99,
+        "score": 0.65,
+        "latent_dot_product": -2.0741
+      }
+    ]
+  }
+}

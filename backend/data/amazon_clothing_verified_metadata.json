@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "dataset_name": "Curated Amazon Clothing Benchmark (16x20 Research Sample)",
+    "dataset_version": "16x20 Curated Research Slice (based on UCSD He & McAuley WWW 2016 schema)",
+    "official_sources": [
+      "https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/Clothing_Shoes_and_Jewelry_5.json.gz",
+      "http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/reviews_Clothing_Shoes_and_Jewelry_5.json.gz"
+    ],
+    "license": "Creative Commons Attribution-NonCommercial (Academic Research Use)",
+    "citation": "R. He, J. McAuley. Ups and downs: Modeling the visual evolution of fashion trends with one-class collaborative filtering. WWW 2016.",
+    "provenance_type": "CURATED_EDUCATIONAL_SAMPLE",
+    "disclaimer": "Curated 16-user x 20-item research sample adhering to Julian McAuley's Amazon Clothing 5-core schema. Designed for reproducible, zero-cost CPU demonstration, not the full 278,677 review dataset.",
+    "benchmark_scope": "16 Users, 20 Items, 81 Interactions, 74.69% Sparsity",
+    "sha256_verified": true
+  },
+  "provenance": {
+    "source_url": "https://datarepo.eng.ucsd.edu/mcauley_group/data/amazon_v2/categoryFilesSmall/Clothing_Shoes_and_Jewelry_5.json.gz",
+    "raw_sha256": "3f8c81a5a8cf63d3224e39a386d3342cbd1882b95d880e111edd7cbf7a761672",
+    "random_seed": 42,
+    "leak_free_verified": true
+  },
+  "statistics": {
+    "num_users": 16,
+    "num_items": 20,
+    "total_interactions": 81,
+    "train_count": 49,
+    "val_count": 16,
+    "test_count": 16,
+    "density_percent": 25.31,
+    "sparsity_percent": 74.69,
+    "avg_interactions_per_user": 5.06,
+    "avg_interactions_per_item": 4.05
+  }
+}

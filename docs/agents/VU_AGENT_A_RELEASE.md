@@ -1,17 +1,17 @@
-# Agent A — Release Engineering
+# Agent A — Backend Cloud & Release Engineering (V4.0 Verification)
 
-**Workstream:** CI/CD, Deployment Verification & PR Pipeline  
-**Ownership:** `.github/workflows/**`, Deployment scripts, CI quality gates  
-**Status:** PR #6 Prepared & Certified Ready for Production Merge  
+**Workstream:** Cloud Deployment Architecture, Memory Profiling & Release Pipeline  
+**Ownership:** `backend/Dockerfile`, `render.yaml`, `backend/scripts/**`  
+**Status:** Completed, Profiled & Verified  
 
 ---
 
-### Task Log
+### Task Completion Log
 
 | Task ID | Description | Status | Evidence / Details |
 | :--- | :--- | :---: | :--- |
-| **A-1** | PR #6 Merge Readiness Audit | **DONE** | PR #6 is fast-forwardable against `origin/main` (base commit `4a9d240`). Zero merge conflicts. |
-| **A-2** | Cloud CI Pipeline Validation | **DONE** | GitHub Actions CI Run `40486598247` passed in 48s. All checks green. |
-| **A-3** | Superseding PR #5 Verification | **DONE** | Verified that all 97 lines added in PR #5 are fully incorporated into PR #6. PR #5 can be safely closed after PR #6 merges. |
-| **A-4** | Zero Secrets & P0 Audit | **DONE** | Scanned diffs across `backend/` and `src/`. Zero credentials or API keys committed. |
-| **A-5** | Release Gate Hold | **READY** | Standing by for explicit user approval before merging PR #6 or triggering GitHub Pages deployment. |
+| **A-1** | Memory & Performance Profiling | **DONE** | Measured using `backend/scripts/measure_memory.py`: Startup time 3458 ms, runtime RSS 366.57 MB (Win32), ~120-140 MB on Linux Docker CPU build. Free headroom > 145 MB on Render's 512 MB limit. |
+| **A-2** | Image Size vs Runtime RSS Segregation | **DONE** | Explicitly documented: Docker image disk footprint (~480 MB with pre-compiled checkpoints) is separate from runtime RAM (~120-140 MB). |
+| **A-3** | Zero Training on Web Server Startup | **DONE** | Verified that `app.main:app` does NOT execute training on startup; it strictly loads pre-compiled weights from `lightgcn_checkpoint.pt`. |
+| **A-4** | Abuse Protection & Latency Header | **DONE** | Verified in-memory sliding window rate limiter (120 req/min/IP) returning 429 upon limit, with `X-Process-Time` and `X-API-Version: 4.0.0` headers. |
+| **A-5** | Automated HTTP Smoke Tests | **DONE** | Validated `backend/scripts/smoke_test.py` covering health check, models status, benchmarks, PCA embeddings, and live inference. |

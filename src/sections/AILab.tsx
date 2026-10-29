@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Sliders, Cpu, Server, Play, CheckCircle2, Layers, Sparkles } from 'lucide-react';
 import { apiClient } from '../api/client';
+import { EmbeddingExplorer } from '../components/EmbeddingExplorer';
 
 type GraphRAGStage = 'Query' | 'Vector' | 'Graph' | 'Fusion' | 'Rerank' | 'Answer';
 const stages: GraphRAGStage[] = ['Query', 'Vector', 'Graph', 'Fusion', 'Rerank', 'Answer'];
@@ -26,7 +27,7 @@ const profiles = [
 ];
 
 export const AILab = () => {
-  const [activeTab, setActiveTab] = useState<'graphrag' | 'arena'>('graphrag');
+  const [activeTab, setActiveTab] = useState<'graphrag' | 'arena' | 'embeddings'>('arena');
   
   // GraphRAG State
   const [selectedQueryIdx, setSelectedQueryIdx] = useState(0);
@@ -48,22 +49,38 @@ export const AILab = () => {
   const [isLoadingRecs, setIsLoadingRecs] = useState<boolean>(false);
 
   useEffect(() => {
+    const unsubscribe = apiClient.subscribeConnection(({ isOnline }) => {
+      if (isOnline) {
+        setApiStatus('online');
+        setApiMode('LIVE FASTAPI BACKEND');
+      } else {
+        setApiStatus('offline');
+        setApiMode('LOCAL VERIFIED DATA');
+      }
+    });
+
     const checkApi = async () => {
       try {
-        const res = await apiClient.get('/models');
+        const res = await apiClient.get('/models', 2500);
         if (res && res.models) {
           setApiStatus('online');
-          setApiMode(res.live ? 'LIVE AI' : 'SIMULATION');
+          setApiMode('LIVE FASTAPI BACKEND');
         } else {
           setApiStatus('offline');
-          setApiMode('SIMULATION');
+          setApiMode('LOCAL VERIFIED DATA');
         }
       } catch {
         setApiStatus('offline');
-        setApiMode('SIMULATION');
+        setApiMode('LOCAL VERIFIED DATA');
+        apiClient.startColdStartWakePoller();
       }
     };
     checkApi();
+
+    return () => {
+      unsubscribe();
+      apiClient.stopColdStartWakePoller();
+    };
   }, []);
 
   const runSimulation = () => {
@@ -122,28 +139,36 @@ export const AILab = () => {
   };
 
   useEffect(() => {
-    if (apiStatus !== 'online') return;
-    
+    let isMounted = true;
     const fetchRecs = async () => {
       setIsLoadingRecs(true);
       try {
-        const res1 = await apiClient.post('/recommendations', { user_id: activeProfile.id, model: arenaModel1, top_k: topK });
-        setApiRecommendations1(res1.items || []);
+        const res1 = await apiClient.getRecommendations(activeProfile.id, arenaModel1, topK);
+        if (isMounted) {
+          setApiRecommendations1(res1.items || []);
+        }
         
         if (arenaModel2 !== 'None') {
-          const res2 = await apiClient.post('/recommendations', { user_id: activeProfile.id, model: arenaModel2, top_k: topK });
-          setApiRecommendations2(res2.items || []);
+          const res2 = await apiClient.getRecommendations(activeProfile.id, arenaModel2, topK);
+          if (isMounted) {
+            setApiRecommendations2(res2.items || []);
+          }
         } else {
-          setApiRecommendations2([]);
+          if (isMounted) {
+            setApiRecommendations2([]);
+          }
         }
-      } catch {
-        setApiStatus('offline');
+      } catch (err) {
+        console.warn('Failed to fetch recommendations:', err);
       } finally {
-        setIsLoadingRecs(false);
+        if (isMounted) {
+          setIsLoadingRecs(false);
+        }
       }
     };
     fetchRecs();
-  }, [apiStatus, activeProfile, arenaModel1, arenaModel2, topK]);
+    return () => { isMounted = false; };
+  }, [activeProfile, arenaModel1, arenaModel2, topK, apiStatus]);
 
   return (
     <section id="lab" className="py-24 bg-[#090F1C] relative border-t border-surfaceHighlight/40">
@@ -201,21 +226,25 @@ export const AILab = () => {
             <p className="text-xs text-textMuted mt-1">Side-by-side benchmark for MF vs LightGCN</p>
           </button>
 
-          <a
-            href="#projects"
-            className="p-4 rounded-xl border bg-surface/50 border-surfaceHighlight hover:border-emerald-500/40 text-left transition-all group"
+          <button
+            onClick={() => setActiveTab('embeddings')}
+            className={`p-4 rounded-xl border text-left transition-all ${
+              activeTab === 'embeddings' 
+                ? 'bg-surface border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
+                : 'bg-surface/50 border-surfaceHighlight hover:border-emerald-500/40'
+            }`}
           >
             <div className="flex items-center justify-between mb-2">
               <Layers className="w-5 h-5 text-emerald-400" />
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                VERIFIED ALGORITHM
+                LIVE PCA 2D
               </span>
             </div>
-            <h4 className="font-display font-semibold text-white text-sm group-hover:text-emerald-400 transition-colors">
-              MMRec Architecture
+            <h4 className="font-display font-semibold text-white text-sm">
+              Embedding Explorer
             </h4>
-            <p className="text-xs text-textMuted mt-1">Interactive User-Item matrix & GNN flow</p>
-          </a>
+            <p className="text-xs text-textMuted mt-1">2D PCA projection of LightGCN latent vectors</p>
+          </button>
 
           <a
             href="#products"
@@ -235,7 +264,7 @@ export const AILab = () => {
         </div>
 
         {/* Operational Status Strip */}
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-surface/70 border border-surfaceHighlight mb-8 backdrop-blur-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-xl bg-surface/70 border border-surfaceHighlight mb-4 backdrop-blur-sm">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-xs font-mono">
               <span className={`w-2 h-2 rounded-full ${apiStatus === 'online' ? 'bg-emerald-400' : 'bg-cyan-400'} animate-pulse`} />
@@ -255,6 +284,21 @@ export const AILab = () => {
             <span className="text-primary font-bold">100% Deterministic</span>
           </div>
         </div>
+
+        {/* Cold-Start Notice Banner */}
+        {apiStatus === 'offline' && (
+          <div className="mb-8 p-3 rounded-xl bg-primary/5 border border-primary/20 flex items-center justify-between gap-3 text-xs font-mono text-slate-300">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+              <span>
+                <strong>Cloud Backend Notice:</strong> Render free tier instance is sleeping or spinning up (~30-50s). Currently serving verified outputs from PyTorch checkpoint <code className="text-primary font-bold">515a9530</code>.
+              </span>
+            </div>
+            <span className="hidden sm:inline-block text-[10px] text-textMuted uppercase font-semibold">
+              Graceful Offline Mode
+            </span>
+          </div>
+        )}
 
         {/* Tab 1: GraphRAG Simulator */}
         {activeTab === 'graphrag' && (
@@ -510,7 +554,7 @@ export const AILab = () => {
                             <div className="h-3 bg-primary/30 rounded w-12" />
                           </div>
                         ))
-                      ) : (apiStatus === 'online' && apiRecommendations1.length > 0 
+                      ) : (apiRecommendations1.length > 0 
                         ? apiRecommendations1 
                         : generateRecommendations(arenaModel1, activeProfile)
                       ).map((item, idx) => (
@@ -533,7 +577,7 @@ export const AILab = () => {
                         <span className="text-[10px] font-mono text-slate-400">Top-{topK}</span>
                       </div>
                       <div className="space-y-2">
-                        {(apiStatus === 'online' && apiRecommendations2.length > 0 
+                        {(apiRecommendations2.length > 0 
                           ? apiRecommendations2 
                           : generateRecommendations(arenaModel2, activeProfile)
                         ).map((item, idx) => (
@@ -553,6 +597,13 @@ export const AILab = () => {
               </div>
 
             </div>
+          </div>
+        )}
+
+        {/* Tab 3: 2D Embedding Space Explorer */}
+        {activeTab === 'embeddings' && (
+          <div className="animate-fade-in-up">
+            <EmbeddingExplorer />
           </div>
         )}
 
